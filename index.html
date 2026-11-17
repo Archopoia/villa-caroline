@@ -269,7 +269,7 @@ a:hover { color: var(--accent); }
 }
 .article > *:first-child { margin-top: 0; }
 .article h2, .article h3, .article .tag-legend, .article table,
-.article .tag-legend p, .article figcaption, .article p > em,
+.article .tag-legend p, .article figcaption, .article p > em:only-child,
 .article .figure-wrap, .article .compare, .article .source-line { text-align: left; }
 h2 {
   margin: 2.5rem 0 .95rem;
@@ -350,7 +350,9 @@ tr:hover td { background: rgba(47,74,60,.04); }
 }
 .figure-wrap:hover .zoom-hint { opacity: 1; }
 .article p:has(> img) { margin-bottom: .2rem; }
-.article p > em {
+/* Captions only: a paragraph that is entirely <em>…</em> (figure legends).
+   Inline emphasis like *cette* must stay in the body flow. */
+.article p > em:only-child {
   display: block;
   font-size: .9rem;
   color: var(--muted);
