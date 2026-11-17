@@ -2,9 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Villa Caroline - monographie</title>
 <meta name="description" content="Monographie documentée de la Villa Caroline, 13 rue Pierre-d’Argenson, Les Ormes.">
+<meta name="theme-color" content="#2f4a3c">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -577,6 +578,8 @@ body.xref-parcelle .xref[data-xref="parcelle"] {
 }
 .back-top:hover { transform: translateY(-2px); border-color: var(--accent); }
 
+.mobile-explore { display: none; }
+
 @media (max-width: 1200px) {
   .layout {
     grid-template-columns: 11.5rem minmax(0, 1fr);
@@ -584,32 +587,145 @@ body.xref-parcelle .xref[data-xref="parcelle"] {
   }
   .explore { display: none; }
   .mobile-explore {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .35rem;
-    margin: 0 0 1.25rem;
-    padding-bottom: .9rem;
+    display: block;
+    margin: 0 0 1.35rem;
+    padding-bottom: 1rem;
     border-bottom: 1px solid var(--line);
   }
+  .mobile-explore .rail-label { margin-top: .75rem; }
+  .mobile-explore .rail-label:first-child { margin-top: 0; }
+  .mobile-explore .chip-row { margin-top: .35rem; }
 }
-@media (min-width: 1201px) {
-  .mobile-explore { display: none; }
-}
+
 @media (max-width: 900px) {
-  .layout { grid-template-columns: 1fr; gap: 1rem; width: min(100% - 1.25rem, 46rem); }
-  .article { justify-self: stretch; max-width: none; }
+  html { scroll-padding-top: 1rem; }
+  body {
+    font-size: 1.05rem;
+    line-height: 1.62;
+  }
+  .hero {
+    min-height: min(52vh, 380px);
+    background-position: center 30%;
+  }
+  .hero-inner {
+    width: min(100% - 1.25rem, 46rem);
+    padding: 1.75rem 0 1.5rem;
+  }
+  .hero h1 { font-size: clamp(1.85rem, 8vw, 2.4rem); }
+  .hero .subtitle { font-size: .95rem; margin-bottom: 1rem; }
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    width: min(100% - 1.25rem, 46rem);
+    padding: 1.25rem 0 4.5rem;
+  }
+  .article {
+    justify-self: stretch;
+    max-width: none;
+    text-align: left; /* avoid justify rivers on narrow screens */
+  }
   .toc {
     position: static;
-    display: flex;
-    flex-wrap: wrap;
-    gap: .1rem .75rem;
     max-height: none;
     overflow: visible;
-    padding-bottom: .75rem;
-    border-bottom: 1px solid var(--line);
+    width: 100%;
   }
-  .toc a { border: 0; padding-left: 0; margin: 0; }
-  .toc a.is-active { background: transparent; text-decoration: underline; }
+  .toc-box {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    padding: .15rem .7rem .55rem;
+  }
+  .toc-box > summary {
+    list-style: none;
+    cursor: pointer;
+    font-family: "Source Sans 3", "Segoe UI", sans-serif;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: .55rem 0;
+  }
+  .toc-box > summary::-webkit-details-marker { display: none; }
+  .toc-box > summary::after {
+    content: " +";
+    float: right;
+    font-weight: 700;
+  }
+  .toc-box[open] > summary::after { content: " −"; }
+  .toc-box .rail-label { display: none; }
+  .toc-box .toc-links {
+    display: grid;
+    gap: .1rem;
+    padding-bottom: .35rem;
+  }
+  .toc a {
+    border: 0;
+    margin: 0;
+    padding: .45rem 0;
+    font-size: .88rem;
+    line-height: 1.3;
+  }
+  .toc a.is-active {
+    background: transparent;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .chip {
+    min-height: 2.5rem;
+    padding: .4rem .7rem;
+    font-size: .8rem;
+  }
+  .tag[data-tip]::after { display: none; } /* tooltips flaky on touch */
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: .88rem;
+  }
+  .compare { aspect-ratio: 4 / 3; min-height: 12rem; }
+  .compare-handle::before {
+    width: 2.6rem;
+    height: 2.6rem;
+  }
+  .lightbox {
+    padding: .75rem;
+    padding-top: max(.75rem, env(safe-area-inset-top));
+  }
+  .lightbox img {
+    max-width: 100%;
+    max-height: 78vh;
+  }
+  .lightbox-close {
+    top: max(.65rem, env(safe-area-inset-top));
+    right: .65rem;
+    min-height: 2.6rem;
+    min-width: 4.2rem;
+    padding: .55rem .8rem;
+  }
+  .lightbox-cap {
+    bottom: max(.75rem, env(safe-area-inset-bottom));
+    font-size: .78rem;
+  }
+  .back-top {
+    right: max(.75rem, env(safe-area-inset-right));
+    bottom: max(.75rem, env(safe-area-inset-bottom));
+    min-height: 2.6rem;
+    min-width: 2.6rem;
+  }
+  .source-line { font-size: .88rem; word-break: break-word; }
+  h2 { font-size: 1.35rem; margin-top: 2rem; }
+  h3 { font-size: 1.08rem; }
+}
+
+@media (min-width: 901px) {
+  .toc-box {
+    border: 0;
+    background: transparent;
+    padding: 0;
+  }
+  .toc-box > summary { display: none; }
+  .toc-box .toc-links { display: block; }
 }
 @media print {
   .progress, .toc, .explore, .mobile-explore, .hero-cta, .back-top, .lightbox, .zoom-hint { display: none !important; }
@@ -632,8 +748,11 @@ body.xref-parcelle .xref[data-xref="parcelle"] {
 </header>
 <div class="layout">
   <nav class="toc" aria-label="Sommaire">
-    <span class="rail-label">Sommaire</span>
-    <a href="#en-quelques-mots">En quelques mots</a>
+    <details class="toc-box">
+      <summary>Sommaire</summary>
+      <span class="rail-label">Sommaire</span>
+      <div class="toc-links">
+      <a href="#en-quelques-mots">En quelques mots</a>
 <a href="#1-la-question-que-lon-se-pose">1. La question que l’on se pose</a>
 <a href="#2-la-maison-et-son-quartier">2. La maison et son quartier</a>
 <a href="#3-les-personnes-du-récit">3. Les personnes du récit</a>
@@ -644,15 +763,23 @@ body.xref-parcelle .xref[data-xref="parcelle"] {
 <a href="#8-conclusion">8. Conclusion</a>
 <a href="#annexe-chronologie-en-un-coup-dœil">Annexe - Chronologie en un coup d’œil</a>
 <a href="#annexe-petit-glossaire">Annexe - Petit glossaire</a>
+      </div>
+    </details>
   </nav>
   <main class="article" id="contenu">
 <div class="mobile-explore" aria-label="Explorer">
-<button type="button" class="chip" data-xref-chip="deglane">Deglane</button>
+  <span class="rail-label">Fils narratifs</span>
+  <div class="chip-row"><button type="button" class="chip" data-xref-chip="deglane">Deglane</button>
 <button type="button" class="chip" data-xref-chip="salis">Salis</button>
 <button type="button" class="chip" data-xref-chip="marie-louise">Marie-Louise</button>
 <button type="button" class="chip" data-xref-chip="audy">Audy</button>
 <button type="button" class="chip" data-xref-chip="naintre">Naintré</button>
-<button type="button" class="chip" data-xref-chip="parcelle">AB 143</button>
+<button type="button" class="chip" data-xref-chip="parcelle">AB 143</button></div>
+  <span class="rail-label">Filtrer par preuve</span>
+  <div class="chip-row"><button type="button" class="chip" data-filter="f">[F]</button>
+<button type="button" class="chip" data-filter="s">[S]</button>
+<button type="button" class="chip" data-filter="h">[H]</button>
+<button type="button" class="chip" data-filter="av">[ÀV]</button></div>
 </div>
 <h2 id="en-quelques-mots">En quelques mots</h2>
 <p>Face au château des Ormes, sur une lanière de jardin entre la rue et le parc, se dresse une maison de villégiature que l’on appelle aujourd’hui Villa Caroline. Elle occupe la <button type="button" class="xref" data-xref="parcelle">parcelle AB</button> 143 - trois cent soixante-six mètres carrés - au 13 de la rue Pierre-d’Argenson. Au début du XXᵉ siècle, la même maison s’appelait déjà Villa <button type="button" class="xref" data-xref="marie-louise">Marie-Louise</button> : une carte postale de la rue le montre clairement. Le volume principal est là sur les vues aériennes des années 1950 ; la piscine, elle, n’apparaît qu’au début des années 2000. La maison n’est pas classée monument historique, mais elle se trouve dans le rayon de protection des abords du château : tout travaux sensibles y demandent un avis préalable.</p>
@@ -1062,6 +1189,15 @@ body.xref-parcelle .xref[data-xref="parcelle"] {
   onScroll();
   backTop?.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 
+  /* TOC: collapsible on phone, always open on desktop */
+  const tocBox = $(".toc-box");
+  const syncTocOpen = () => {
+    if (!tocBox) return;
+    tocBox.open = !window.matchMedia("(max-width: 900px)").matches;
+  };
+  syncTocOpen();
+  window.addEventListener("resize", syncTocOpen, { passive: true });
+
   /* TOC scroll-spy */
   const tocLinks = $$(".toc a[href^='#']");
   const sections = tocLinks
@@ -1085,6 +1221,13 @@ body.xref-parcelle .xref[data-xref="parcelle"] {
     );
     sections.forEach((s) => io.observe(s));
   }
+  tocLinks.forEach((a) => {
+    a.addEventListener("click", () => {
+      if (tocBox && window.matchMedia("(max-width: 900px)").matches) {
+        tocBox.open = false;
+      }
+    });
+  });
 
   /* Tag tips */
   const TIPS = {
@@ -1298,10 +1441,12 @@ body.xref-parcelle .xref[data-xref="parcelle"] {
     if (lbCap) lbCap.textContent = cap || "";
     lb.classList.add("is-open");
     lb.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
   };
   const closeLb = () => {
     lb?.classList.remove("is-open");
     lb?.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
   };
   $$(".figure-wrap img, .article > p > img").forEach((img) => {
     if (img.closest(".compare")) return;
@@ -1320,7 +1465,7 @@ body.xref-parcelle .xref[data-xref="parcelle"] {
     if (e.key === "Escape") closeLb();
   });
 
-  /* Compare sliders */
+  /* Compare sliders (touch + mouse) */
   $$(".compare").forEach((box) => {
     const top = $(".compare-top", box);
     const handle = $(".compare-handle", box);
@@ -1335,8 +1480,13 @@ body.xref-parcelle .xref[data-xref="parcelle"] {
     };
     const start = (e) => {
       dragging = true;
-      box.setPointerCapture?.(e.pointerId);
+      try {
+        box.setPointerCapture?.(e.pointerId);
+      } catch (_) {
+        /* ignore */
+      }
       setPos(e.clientX);
+      e.preventDefault();
     };
     const move = (e) => {
       if (!dragging) return;
@@ -1345,12 +1495,13 @@ body.xref-parcelle .xref[data-xref="parcelle"] {
     const end = () => {
       dragging = false;
     };
-    box.addEventListener("pointerdown", start);
-    box.addEventListener("pointermove", move);
+    box.addEventListener("pointerdown", start, { passive: false });
+    box.addEventListener("pointermove", move, { passive: true });
     box.addEventListener("pointerup", end);
     box.addEventListener("pointercancel", end);
   });
 })();
+
 </script>
 </body>
 </html>
