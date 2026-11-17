@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Villa Caroline - Archives</title>
+<meta name="description" content="Archives documentaires de la Villa Caroline (Les Ormes) : images, cadastre, actes, PLU.">
+<meta name="theme-color" content="#2f4a3c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>:root {
+  --ink: #1c2420;
+  --muted: #5a6560;
+  --paper: #f4f2ee;
+  --panel: #ffffff;
+  --line: #d4d8d3;
+  --accent: #2f4a3c;
+  --accent-soft: rgba(47, 74, 60, 0.12);
+  --link: #1a4f6e;
+  --f: #1f6b45;
+  --s: #9a6b12;
+  --h: #2a5a8a;
+  --av: #6b6f6c;
+  --measure: 46rem;
+  --rail: 12.5rem;
+  --flash: #d8e8c8;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 3.5rem; }
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 500px at 10% -10%, #e7ebe4 0%, transparent 55%),
+    var(--paper);
+  font-family: "Source Serif 4", "Libre Baskerville", Georgia, "Times New Roman", serif;
+  font-size: 1.125rem;
+  line-height: 1.68;
+}
+a {
+  color: var(--link);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  transition: color .15s ease, background-color .15s ease;
+}
+a:hover { color: var(--accent); }
+
+/* Site nav (Monographie | Archives) */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 80;
+  background: rgba(244, 242, 238, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.site-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: min(100% - 1.5rem, 90rem);
+  margin: 0 auto;
+  padding: .65rem 0;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+}
+.site-brand {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+.site-tabs { display: flex; gap: .25rem; }
+.site-tabs a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: .88rem;
+  font-weight: 600;
+  padding: .45rem .75rem;
+  border: 1px solid transparent;
+}
+.site-tabs a:hover { color: var(--ink); }
+.site-tabs a.is-active {
+  color: var(--accent);
+  border-color: var(--line);
+  background: var(--panel);
+}
+
+/* Progress */
+.progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  z-index: 100;
+  background: transparent;
+  pointer-events: none;
+}
+.progress > span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent), #6a8f72);
+  transition: width .05s linear;
+}
+
+/* Hero */
+.hero {
+  position: relative;
+  width: 100%;
+  min-height: min(68vh, 560px);
+  background: #2a3330 center/cover no-repeat;
+  display: flex;
+  align-items: flex-end;
+  isolation: isolate;
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(12,18,16,.82) 0%, rgba(12,18,16,.28) 48%, rgba(12,18,16,.18) 100%);
+}
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  width: min(100% - 2rem, 74rem);
+  margin: 0 auto;
+  padding: 3rem 0 2.4rem;
+  color: #f4f2ee;
+}
+.hero h1 {
+  margin: 0 0 .4rem;
+  font-size: clamp(2.3rem, 5.2vw, 3.55rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  animation: rise .7s ease both;
+}
+.hero .subtitle {
+  margin: 0 0 1.25rem;
+  max-width: 36rem;
+  font-size: 1.05rem;
+  opacity: .92;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  animation: rise .7s .08s ease both;
+}
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: .92rem;
+  font-weight: 600;
+  color: #f4f2ee;
+  text-decoration: none;
+  border: 1px solid rgba(244,242,238,.45);
+  padding: .55rem 1rem;
+  transition: background .2s ease, border-color .2s ease, transform .2s ease;
+  animation: rise .7s .16s ease both;
+}
+.hero-cta:hover {
+  background: rgba(244,242,238,.12);
+  border-color: rgba(244,242,238,.85);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.hero-cta::after { content: "↓"; opacity: .8; }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Layout */
+.layout {
+  display: grid;
+  grid-template-columns: var(--rail) minmax(0, 1fr) var(--rail);
+  column-gap: clamp(1.75rem, 3.5vw, 3.25rem);
+  row-gap: 1.5rem;
+  width: min(100% - 2.5rem, 90rem);
+  margin: 0 auto;
+  padding: 2rem 0 5rem;
+  align-items: start;
+}
+.toc, .explore {
+  position: sticky;
+  top: 1.4rem;
+  align-self: start;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: .8rem;
+  line-height: 1.35;
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+}
+.rail-label {
+  display: block;
+  margin: 0 0 .55rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  font-size: .7rem;
+  font-weight: 700;
+}
+.toc a {
+  display: block;
+  color: var(--muted);
+  text-decoration: none;
+  padding: .32rem 0 .32rem .7rem;
+  border-left: 2px solid transparent;
+  margin-left: -.7rem;
+  transition: color .15s ease, border-color .15s ease, background .15s ease;
+}
+.toc a:hover { color: var(--ink); border-left-color: #a7b7ab; }
+.toc a.is-active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* Explore rail */
+.explore-block { margin-bottom: 1.35rem; }
+.chip-row { display: flex; flex-wrap: wrap; gap: .35rem; }
+.chip {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  font-size: .74rem;
+  font-weight: 600;
+  padding: .28rem .55rem;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, color .15s ease, transform .15s ease;
+}
+.chip:hover { border-color: var(--accent); transform: translateY(-1px); }
+.chip.is-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #f7f6f3;
+}
+.chip.tag-f.is-on, .chip[data-filter="f"].is-on { background: var(--f); border-color: var(--f); }
+.chip.tag-s.is-on, .chip[data-filter="s"].is-on { background: var(--s); border-color: var(--s); }
+.chip.tag-h.is-on, .chip[data-filter="h"].is-on { background: var(--h); border-color: var(--h); }
+.chip.tag-av.is-on, .chip[data-filter="av"].is-on { background: var(--av); border-color: var(--av); }
+.explore-hint {
+  margin: .55rem 0 0;
+  color: var(--muted);
+  font-size: .72rem;
+  line-height: 1.35;
+}
+.quick-links { display: grid; gap: .25rem; }
+.quick-links a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: .2rem 0;
+}
+.quick-links a:hover { color: var(--link); }
+
+/* Article */
+.article {
+  min-width: 0;
+  max-width: var(--measure);
+  width: 100%;
+  justify-self: center;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+.article > *:first-child { margin-top: 0; }
+.article h2, .article h3, .article .tag-legend, .article table,
+.article .tag-legend p, .article figcaption, .article p > em,
+.article .figure-wrap, .article .compare, .article .source-line { text-align: left; }
+h2 {
+  margin: 2.5rem 0 .95rem;
+  font-size: 1.55rem;
+  line-height: 1.25;
+  color: var(--accent);
+  font-weight: 600;
+  scroll-margin-top: 3.5rem;
+}
+h3 {
+  margin: 1.7rem 0 .55rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  scroll-margin-top: 3.5rem;
+}
+h2.is-flash, h3.is-flash, .xref-hit.is-flash {
+  animation: flash 1.2s ease;
+}
+@keyframes flash {
+  0%, 100% { background: transparent; }
+  25% { background: var(--flash); }
+}
+p { margin: 0 0 1rem; }
+blockquote {
+  margin: 1rem 0;
+  padding: .25rem 0 .25rem 1rem;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+  font-style: italic;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .95rem;
+  margin: 1rem 0 1.4rem;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+}
+th, td {
+  border-bottom: 1px solid var(--line);
+  padding: .45rem .4rem;
+  text-align: left;
+  vertical-align: top;
+}
+tr:hover td { background: rgba(47,74,60,.04); }
+
+/* Figures + lightbox */
+.figure-wrap {
+  margin: 1.15rem 0 .2rem;
+  position: relative;
+}
+.figure-wrap img,
+.article > p > img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0;
+  cursor: zoom-in;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.figure-wrap:hover img,
+.article > p > img:hover {
+  transform: scale(1.01);
+  box-shadow: 0 10px 28px rgba(28,36,32,.12);
+}
+.figure-wrap .zoom-hint {
+  position: absolute;
+  right: .55rem;
+  bottom: .55rem;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: .68rem;
+  font-weight: 600;
+  color: #f4f2ee;
+  background: rgba(12,18,16,.55);
+  padding: .2rem .4rem;
+  opacity: 0;
+  transition: opacity .2s ease;
+  pointer-events: none;
+}
+.figure-wrap:hover .zoom-hint { opacity: 1; }
+.article p:has(> img) { margin-bottom: .2rem; }
+.article p > em {
+  display: block;
+  font-size: .9rem;
+  color: var(--muted);
+  margin: 0 0 1.25rem;
+  line-height: 1.45;
+}
+
+/* Compare slider */
+.compare {
+  position: relative;
+  margin: 1.2rem 0 1.5rem;
+  overflow: hidden;
+  background: #1c2420;
+  user-select: none;
+  touch-action: none;
+  aspect-ratio: 16 / 10;
+}
+.compare img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  margin: 0;
+  max-width: none;
+  pointer-events: none;
+  cursor: default;
+  transform: none !important;
+  box-shadow: none !important;
+}
+.compare .compare-top {
+  clip-path: inset(0 50% 0 0);
+}
+.compare-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  background: #f4f2ee;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+.compare-handle::before {
+  content: "⟷";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: #f4f2ee;
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+  font-size: .85rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,.25);
+}
+.compare-label {
+  position: absolute;
+  top: .6rem;
+  z-index: 2;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #f4f2ee;
+  background: rgba(12,18,16,.5);
+  padding: .2rem .45rem;
+}
+.compare-label.before { left: .6rem; }
+.compare-label.after { right: .6rem; }
+.compare-caption {
+  margin: .35rem 0 1.4rem;
+  font-size: .9rem;
+  color: var(--muted);
+  font-style: italic;
+  font-family: "Source Serif 4", Georgia, serif;
+}
+
+/* Tags */
+.tag {
+  display: inline-block;
+  position: relative;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: .72rem;
+  font-weight: 700;
+  font-style: normal;
+  letter-spacing: .02em;
+  padding: .08em .38em;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  vertical-align: .12em;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: help;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+.tag:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 0 currentColor;
+  background: rgba(255,255,255,.65);
+}
+.tag-f { color: var(--f); }
+.tag-s { color: var(--s); }
+.tag-h { color: var(--h); }
+.tag-av { color: var(--av); }
+.tag[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + .35rem);
+  transform: translateX(-50%) translateY(4px);
+  min-width: 11rem;
+  max-width: 16rem;
+  padding: .4rem .5rem;
+  background: #1c2420;
+  color: #f4f2ee;
+  font-size: .68rem;
+  font-weight: 500;
+  line-height: 1.35;
+  white-space: normal;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .15s ease, transform .15s ease;
+  z-index: 20;
+}
+.tag[data-tip]:hover::after,
+.tag[data-tip]:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+body.is-filtering .article > *.is-proof-dim,
+body.is-filtering .toc a.is-proof-dim {
+  opacity: 0.28;
+  transition: opacity 0.2s ease;
+}
+body.is-filtering .article > *:not(.is-proof-dim),
+body.is-filtering .toc a:not(.is-proof-dim) {
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+body.is-filtering .tag:not(.is-proof-match) {
+  opacity: 0.35;
+}
+body.is-filtering .tag.is-proof-match {
+  opacity: 1;
+}
+.tag-legend {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 1rem 1.1rem;
+  margin: 1.5rem 0 2rem;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: .92rem;
+}
+.tag-legend table { margin-bottom: 0; }
+
+/* Source lines + xrefs */
+.source-line {
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: .92rem;
+  padding: .35rem .55rem;
+  margin: -.35rem 0 1rem;
+  border-left: 2px solid transparent;
+  transition: background .15s ease, border-color .15s ease;
+}
+.source-line:hover {
+  background: rgba(26,79,110,.06);
+  border-left-color: var(--link);
+}
+.source-line a { word-break: break-word; }
+.xref {
+  appearance: none;
+  border: 0;
+  background: linear-gradient(transparent 60%, rgba(47,74,60,.18) 60%);
+  color: inherit;
+  font: inherit;
+  padding: 0 .05em;
+  cursor: pointer;
+  border-radius: 1px;
+  transition: background .15s ease;
+}
+.xref:hover {
+  background: linear-gradient(transparent 55%, rgba(47,74,60,.32) 55%);
+  color: var(--accent);
+}
+body.xref-salis .xref[data-xref="salis"],
+body.xref-deglane .xref[data-xref="deglane"],
+body.xref-marie-louise .xref[data-xref="marie-louise"],
+body.xref-audy .xref[data-xref="audy"],
+body.xref-naintre .xref[data-xref="naintre"],
+body.xref-parcelle .xref[data-xref="parcelle"] {
+  background: var(--flash);
+}
+
+/* Lightbox */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(12,18,16,.88);
+  backdrop-filter: blur(4px);
+}
+.lightbox.is-open { display: flex; }
+.lightbox img {
+  max-width: min(1100px, 94vw);
+  max-height: 86vh;
+  object-fit: contain;
+  box-shadow: 0 20px 60px rgba(0,0,0,.4);
+  animation: rise .25s ease;
+}
+.lightbox-cap {
+  position: absolute;
+  left: 50%;
+  bottom: 1.1rem;
+  transform: translateX(-50%);
+  max-width: min(48rem, 90vw);
+  color: #e8ebe6;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: .85rem;
+  text-align: center;
+  opacity: .9;
+}
+.lightbox-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  appearance: none;
+  border: 1px solid rgba(244,242,238,.35);
+  background: transparent;
+  color: #f4f2ee;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: .85rem;
+  padding: .4rem .7rem;
+  cursor: pointer;
+}
+.lightbox-close:hover { background: rgba(244,242,238,.12); }
+
+.back-top {
+  position: fixed;
+  right: 1.1rem;
+  bottom: 1.1rem;
+  z-index: 50;
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: .78rem;
+  font-weight: 600;
+  padding: .55rem .7rem;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease;
+}
+.back-top.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.back-top:hover { transform: translateY(-2px); border-color: var(--accent); }
+
+.mobile-explore { display: none; }
+
+@media (max-width: 1200px) {
+  .layout {
+    grid-template-columns: 11.5rem minmax(0, 1fr);
+    width: min(100% - 2rem, 78rem);
+  }
+  .explore { display: none; }
+  .mobile-explore {
+    display: block;
+    margin: 0 0 1.35rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .mobile-explore .rail-label { margin-top: .75rem; }
+  .mobile-explore .rail-label:first-child { margin-top: 0; }
+  .mobile-explore .chip-row { margin-top: .35rem; }
+}
+
+@media (max-width: 900px) {
+  html { scroll-padding-top: 1rem; }
+  body {
+    font-size: 1.05rem;
+    line-height: 1.62;
+  }
+  .hero {
+    min-height: min(52vh, 380px);
+    background-position: center 30%;
+  }
+  .hero-inner {
+    width: min(100% - 1.25rem, 46rem);
+    padding: 1.75rem 0 1.5rem;
+  }
+  .hero h1 { font-size: clamp(1.85rem, 8vw, 2.4rem); }
+  .hero .subtitle { font-size: .95rem; margin-bottom: 1rem; }
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    width: min(100% - 1.25rem, 46rem);
+    padding: 1.25rem 0 4.5rem;
+  }
+  .article {
+    justify-self: stretch;
+    max-width: none;
+    text-align: left; /* avoid justify rivers on narrow screens */
+  }
+  .toc {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    width: 100%;
+  }
+  .toc-box {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    padding: .15rem .7rem .55rem;
+  }
+  .toc-box > summary {
+    list-style: none;
+    cursor: pointer;
+    font-family: "Source Sans 3", "Segoe UI", sans-serif;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: .55rem 0;
+  }
+  .toc-box > summary::-webkit-details-marker { display: none; }
+  .toc-box > summary::after {
+    content: " +";
+    float: right;
+    font-weight: 700;
+  }
+  .toc-box[open] > summary::after { content: " −"; }
+  .toc-box .rail-label { display: none; }
+  .toc-box .toc-links {
+    display: grid;
+    gap: .1rem;
+    padding-bottom: .35rem;
+  }
+  .toc a {
+    border: 0;
+    margin: 0;
+    padding: .45rem 0;
+    font-size: .88rem;
+    line-height: 1.3;
+  }
+  .toc a.is-active {
+    background: transparent;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .chip {
+    min-height: 2.5rem;
+    padding: .4rem .7rem;
+    font-size: .8rem;
+  }
+  .tag[data-tip]::after { display: none; } /* tooltips flaky on touch */
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: .88rem;
+  }
+  .compare { aspect-ratio: 4 / 3; min-height: 12rem; }
+  .compare-handle::before {
+    width: 2.6rem;
+    height: 2.6rem;
+  }
+  .lightbox {
+    padding: .75rem;
+    padding-top: max(.75rem, env(safe-area-inset-top));
+  }
+  .lightbox img {
+    max-width: 100%;
+    max-height: 78vh;
+  }
+  .lightbox-close {
+    top: max(.65rem, env(safe-area-inset-top));
+    right: .65rem;
+    min-height: 2.6rem;
+    min-width: 4.2rem;
+    padding: .55rem .8rem;
+  }
+  .lightbox-cap {
+    bottom: max(.75rem, env(safe-area-inset-bottom));
+    font-size: .78rem;
+  }
+  .back-top {
+    right: max(.75rem, env(safe-area-inset-right));
+    bottom: max(.75rem, env(safe-area-inset-bottom));
+    min-height: 2.6rem;
+    min-width: 2.6rem;
+  }
+  .source-line { font-size: .88rem; word-break: break-word; }
+  h2 { font-size: 1.35rem; margin-top: 2rem; }
+  h3 { font-size: 1.08rem; }
+}
+
+@media (min-width: 901px) {
+  .toc-box {
+    border: 0;
+    background: transparent;
+    padding: 0;
+  }
+  .toc-box > summary { display: none; }
+  .toc-box .toc-links { display: block; }
+}
+@media print {
+  .site-nav, .progress, .toc, .explore, .mobile-explore, .hero-cta, .back-top, .lightbox, .zoom-hint { display: none !important; }
+  body { background: #fff; font-size: 10.5pt; }
+  .hero { min-height: 180px; }
+  .layout { display: block; width: auto; margin: 0; padding: 0 12mm; }
+  a { color: inherit; text-decoration: none; }
+  .compare { break-inside: avoid; }
+}
+
+/* Site nav (shared) */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 80;
+  background: rgba(244, 242, 238, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.site-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: min(100% - 1.5rem, 90rem);
+  margin: 0 auto;
+  padding: .65rem 0;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+}
+.site-brand {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+.site-tabs {
+  display: flex;
+  gap: .25rem;
+}
+.site-tabs a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: .88rem;
+  font-weight: 600;
+  padding: .45rem .75rem;
+  border: 1px solid transparent;
+}
+.site-tabs a:hover { color: var(--ink); }
+.site-tabs a.is-active {
+  color: var(--accent);
+  border-color: var(--line);
+  background: var(--panel);
+}
+
+/* Archives page */
+.archives-page .arch-main {
+  width: min(100% - 1.5rem, 90rem);
+  margin: 0 auto;
+  padding: 1.5rem 0 4rem;
+}
+.arch-hero h1 {
+  margin: 0 0 .5rem;
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  color: var(--accent);
+}
+.arch-hero p {
+  max-width: 46rem;
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.55;
+  margin: 0 0 1.5rem;
+}
+.arch-controls {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.1rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+}
+.arch-search input {
+  width: 100%;
+  max-width: 28rem;
+  font: inherit;
+  font-size: 1rem;
+  padding: .55rem .7rem;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+}
+.arch-search input:focus {
+  outline: 2px solid var(--accent-soft);
+  border-color: var(--accent);
+}
+#arch-cats .chip.is-on,
+#arch-tags .chip.is-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #f7f6f3;
+}
+
+.arch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16.5rem, 1fr));
+  gap: 1.1rem;
+}
+.arch-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  min-height: 100%;
+  transition: border-color .15s ease, transform .15s ease;
+}
+.arch-card:hover { border-color: #a7b7ab; }
+.arch-card.is-hidden { display: none; }
+.arch-thumb {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: #e8ebe6;
+  overflow: hidden;
+}
+.arch-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  cursor: zoom-in;
+  margin: 0;
+  transition: transform .25s ease;
+}
+.arch-card:hover .arch-thumb img { transform: scale(1.03); }
+.arch-thumb.is-pdf {
+  display: grid;
+  place-items: center;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-weight: 700;
+  color: var(--accent);
+  font-size: .95rem;
+  letter-spacing: .04em;
+}
+.arch-body {
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+  padding: .75rem .8rem 0.9rem;
+  flex: 1;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+}
+.arch-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+  align-items: center;
+  font-size: .72rem;
+  color: var(--muted);
+}
+.arch-cat {
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  font-weight: 700;
+}
+.arch-body h2 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.3;
+  color: var(--ink);
+  font-family: "Source Serif 4", Georgia, serif;
+  font-weight: 600;
+}
+.arch-legend {
+  margin: 0;
+  font-size: .84rem;
+  line-height: 1.4;
+  color: var(--muted);
+  flex: 1;
+}
+.arch-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin-top: .45rem;
+}
+.arch-actions a {
+  font-size: .78rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: .4rem .55rem;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  background: #fff;
+}
+.arch-actions a:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.arch-actions a.download {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #f7f6f3;
+}
+.arch-actions a.download:hover {
+  filter: brightness(1.08);
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .site-nav-inner { padding: .55rem 0; }
+  .site-brand { font-size: .95rem; }
+  .site-tabs a { padding: .4rem .55rem; font-size: .82rem; }
+  .arch-grid { grid-template-columns: 1fr 1fr; gap: .75rem; }
+  .arch-body h2 { font-size: .92rem; }
+  .arch-legend { font-size: .78rem; }
+}
+@media (max-width: 520px) {
+  .arch-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body class="archives-page">
+
+<header class="site-nav" role="navigation" aria-label="Sections du site">
+  <div class="site-nav-inner">
+    <a class="site-brand" href="index.html">Villa Caroline</a>
+    <nav class="site-tabs">
+      <a href="index.html">Monographie</a>
+      <a href="archives.html" class="is-active">Archives</a>
+    </nav>
+  </div>
+</header>
+
+<main class="arch-main">
+  <header class="arch-hero">
+    <h1>Archives</h1>
+    <p>Pièces sélectionnées pour le dossier Villa Caroline : photos de la maison, carte postale Marie-Louise, cadastre et vues aériennes, extraits notariaux et d'état civil, contextes Deglane / Salis, documents PLU. Chaque fiche porte une légende, un lien source et un téléchargement.</p>
+  </header>
+
+  <section class="arch-controls" aria-label="Filtres">
+    <label class="arch-search">
+      <span class="rail-label">Recherche</span>
+      <input type="search" id="arch-q" placeholder="Audy, Naintré, piscine, PLU…" autocomplete="off">
+    </label>
+    <div>
+      <span class="rail-label">Catégories</span>
+      <div class="chip-row" id="arch-cats"><button type="button" class="chip is-on" data-cat="all">Tout</button>
+<button type="button" class="chip" data-cat="villa">Villa aujourd'hui</button>
+<button type="button" class="chip" data-cat="carte-postale">Carte postale</button>
+<button type="button" class="chip" data-cat="cadastre">Cadastre & aériennes</button>
+<button type="button" class="chip" data-cat="notarial">Notarial</button>
+<button type="button" class="chip" data-cat="etat-civil">État civil</button>
+<button type="button" class="chip" data-cat="deglane">Deglane</button>
+<button type="button" class="chip" data-cat="salis">Salis / Chat Noir</button>
+<button type="button" class="chip" data-cat="contexte">Contexte Ormes</button>
+<button type="button" class="chip" data-cat="plans">Plans / PLU</button></div>
+    </div>
+    <div>
+      <span class="rail-label">Niveau de preuve</span>
+      <div class="chip-row" id="arch-tags">
+<button type="button" class="chip is-on" data-tag="all">Tous tags</button>
+<button type="button" class="chip" data-tag="F">[F]</button>
+<button type="button" class="chip" data-tag="S">[S]</button>
+</div>
+    </div>
+    <p class="explore-hint"><span id="arch-count">0</span> document(s) · clic image = aperçu · bouton = télécharger</p>
+  </section>
+
+  <div class="arch-grid" id="arch-grid"></div>
+</main>
+
+<div class="lightbox" aria-hidden="true" role="dialog" aria-label="Aperçu">
+  <button type="button" class="lightbox-close">Fermer</button>
+  <img src="" alt="">
+  <div class="lightbox-cap"></div>
+</div>
+
+<script type="application/json" id="arch-json">[{"id": "A-001", "cat": "villa", "title": "Façade sur rue", "legend": "Villa Caroline vue depuis la rue Pierre-d'Argenson.", "date": "2021", "tag": "S", "source": "https://daysontheclaise.blogspot.com/2021/02/villa-caroline.html", "source_label": "Days on the Claise", "file": "archives/2021_DaysOnTheClaise_facade_rue_ffec2b3a.jpg", "ext": "jpg", "download": "archives/2021_DaysOnTheClaise_facade_rue_ffec2b3a.jpg"}, {"id": "A-002", "cat": "villa", "title": "Monogramme au sol", "legend": "Motif en carrelage (lecture L/R selon le blog). État récent.", "date": "2021", "tag": "S", "source": "https://daysontheclaise.blogspot.com/2021/02/villa-caroline.html", "source_label": "Days on the Claise", "file": "archives/2026-11-13_blog_monogramme_LR_hires_de043808.jpg", "ext": "jpg", "download": "archives/2026-11-13_blog_monogramme_LR_hires_de043808.jpg"}, {"id": "A-003", "cat": "villa", "title": "Portail et ferronnerie", "legend": "Entrée côté rue, état contemporain.", "date": "2021", "tag": "S", "source": "https://daysontheclaise.blogspot.com/2021/02/villa-caroline.html", "source_label": "Days on the Claise", "file": "archives/2026-11-13_blog_portail_hires_af629f8f.jpg", "ext": "jpg", "download": "archives/2026-11-13_blog_portail_hires_af629f8f.jpg"}, {"id": "A-004", "cat": "villa", "title": "Façade (haute résolution)", "legend": "Même maison, capture blog haute définition.", "date": "2021", "tag": "S", "source": "https://daysontheclaise.blogspot.com/2021/02/villa-caroline.html", "source_label": "Days on the Claise", "file": "archives/DaysOnTheClaise_villa_caroline1_s1600_2bd26b44.jpg", "ext": "jpg", "download": "archives/DaysOnTheClaise_villa_caroline1_s1600_2bd26b44.jpg"}, {"id": "A-005", "cat": "villa", "title": "Détail de façade 2", "legend": "Détail architectural, photo récente.", "date": "2021", "tag": "S", "source": "https://daysontheclaise.blogspot.com/2021/02/villa-caroline.html", "source_label": "Days on the Claise", "file": "archives/DaysOnTheClaise_villa_caroline2_s1600_353cd35c.jpg", "ext": "jpg", "download": "archives/DaysOnTheClaise_villa_caroline2_s1600_353cd35c.jpg"}, {"id": "A-006", "cat": "villa", "title": "Portail (haute résolution)", "legend": "Grille / portail, capture blog.", "date": "2021", "tag": "S", "source": "https://daysontheclaise.blogspot.com/2021/02/villa-caroline.html", "source_label": "Days on the Claise", "file": "archives/DaysOnTheClaise_villa_caroline5_s1600_7bc11003.jpg", "ext": "jpg", "download": "archives/DaysOnTheClaise_villa_caroline5_s1600_7bc11003.jpg"}, {"id": "A-007", "cat": "villa", "title": "Façade (reportage OT)", "legend": "Reportage Office de tourisme Grand Châtellerault.", "date": "2020", "tag": "S", "source": "https://www.tourisme-chatellerault.fr/2020/09/08/les-ormes-la-surprise-du-chef-1-2/", "source_label": "OT Grand Châtellerault", "file": "archives/OT2020_villa_Caroline_facade_09d2ead6.jpg", "ext": "jpg", "download": "archives/OT2020_villa_Caroline_facade_09d2ead6.jpg"}, {"id": "A-008", "cat": "villa", "title": "Intérieur / vitraux", "legend": "Intérieur photographié pour l'OT (2020).", "date": "2020", "tag": "S", "source": "https://www.tourisme-chatellerault.fr/2020/09/08/les-ormes-la-surprise-du-chef-1-2/", "source_label": "OT Grand Châtellerault", "file": "archives/OT2020_villa_Caroline_interieur_e9bf71c8.jpg", "ext": "jpg", "download": "archives/OT2020_villa_Caroline_interieur_e9bf71c8.jpg"}, {"id": "A-009", "cat": "villa", "title": "Jardin / cèdre", "legend": "Jardin côté parc, reportage OT.", "date": "2020", "tag": "S", "source": "https://www.tourisme-chatellerault.fr/2020/09/08/les-ormes-la-surprise-du-chef-1-2/", "source_label": "OT Grand Châtellerault", "file": "archives/OT2020_villa_Caroline_jardin_bbd0ce0d.jpg", "ext": "jpg", "download": "archives/OT2020_villa_Caroline_jardin_bbd0ce0d.jpg"}, {"id": "A-010", "cat": "villa", "title": "Grille d'entrée", "legend": "Grille / clôture, reportage OT.", "date": "2020", "tag": "S", "source": "https://www.tourisme-chatellerault.fr/2020/09/08/les-ormes-la-surprise-du-chef-1-2/", "source_label": "OT Grand Châtellerault", "file": "archives/OT2020_villa_grille_5f0ac6bc.jpg", "ext": "jpg", "download": "archives/OT2020_villa_grille_5f0ac6bc.jpg"}, {"id": "A-011", "cat": "villa", "title": "Vitrail rabelaisien", "legend": "Vitrail de la salle à manger. État récent ; origine 1890 non prouvée.", "date": "2020", "tag": "S", "source": "https://www.tourisme-chatellerault.fr/2020/09/08/les-ormes-la-surprise-du-chef-1-2/", "source_label": "OT Grand Châtellerault", "file": "archives/2026-11-13_OT_vitraux_rabelais_fc381dfe.jpg", "ext": "jpg", "download": "archives/2026-11-13_OT_vitraux_rabelais_fc381dfe.jpg"}, {"id": "A-012", "cat": "villa", "title": "Plafond allégorique", "legend": "Plafond peint, état récent. Pas d'attribution d'époque.", "date": "2020", "tag": "S", "source": "https://www.tourisme-chatellerault.fr/2020/09/08/les-ormes-la-surprise-du-chef-1-2/", "source_label": "OT Grand Châtellerault", "file": "archives/2026-11-13_OT_plafond_allegorie_89230e9d.jpg", "ext": "jpg", "download": "archives/2026-11-13_OT_plafond_allegorie_89230e9d.jpg"}, {"id": "A-013", "cat": "villa", "title": "Vitraux paysages", "legend": "Vitraux à sujets paysagers, reportage OT.", "date": "2020", "tag": "S", "source": "https://www.tourisme-chatellerault.fr/2020/09/08/les-ormes-la-surprise-du-chef-1-2/", "source_label": "OT Grand Châtellerault", "file": "archives/2026-11-13_OT_vitraux_paysages_86e520e2.jpg", "ext": "jpg", "download": "archives/2026-11-13_OT_vitraux_paysages_86e520e2.jpg"}, {"id": "A-014", "cat": "villa", "title": "Portail / plaque", "legend": "Détail d'entrée, reportage OT.", "date": "2020", "tag": "S", "source": "https://www.tourisme-chatellerault.fr/2020/09/08/les-ormes-la-surprise-du-chef-1-2/", "source_label": "OT Grand Châtellerault", "file": "archives/2026-11-13_OT_portail_plaque_22d0ae8f.jpg", "ext": "jpg", "download": "archives/2026-11-13_OT_portail_plaque_22d0ae8f.jpg"}, {"id": "A-015", "cat": "villa", "title": "Villa (JPG haute résolution OT)", "legend": "Photo OT en résolution élevée.", "date": "2020", "tag": "S", "source": "https://www.tourisme-chatellerault.fr/2020/09/08/les-ormes-la-surprise-du-chef-1-2/", "source_label": "OT Grand Châtellerault", "file": "archives/OT2020_IMG_6924_21b32c7f.jpg", "ext": "jpg", "download": "archives/OT2020_IMG_6924_21b32c7f.jpg"}, {"id": "A-016", "cat": "carte-postale", "title": "Villa Marie-Louise (~1903)", "legend": "Carte postale : rue Pierre d'Argenson, Villa Marie-Louise à droite. Prouve le nom sur cette rue.", "date": "~1903", "tag": "F", "source": "https://en.geneanet.org/postcards/view/7781445", "source_label": "Geneanet", "file": "archives/Geneanet_7781445_Villa_Marie-Louise_1903_01908b46.jpg", "ext": "jpg", "download": "archives/Geneanet_7781445_Villa_Marie-Louise_1903_01908b46.jpg"}, {"id": "A-017", "cat": "cadastre", "title": "Parcelle AB 143", "legend": "Cadastre actuel : 13 rue Pierre-d'Argenson, 366 m². Fixe l'adresse, pas le propriétaire historique.", "date": "actuel", "tag": "F", "source": "https://cadastre.data.gouv.fr/map?parcel=86183000AB0143#18/46.975082/0.603394", "source_label": "cadastre.data.gouv.fr", "file": "archives/capture_AB0143_selectionnee_85250418.jpg", "ext": "jpg", "download": "archives/capture_AB0143_selectionnee_85250418.jpg"}, {"id": "A-018", "cat": "cadastre", "title": "Cadastre rue Pierre-d'Argenson", "legend": "Contexte parcellaire autour du n°13.", "date": "actuel", "tag": "F", "source": "https://cadastre.data.gouv.fr/map?parcel=86183000AB0143#18/46.975082/0.603394", "source_label": "cadastre.data.gouv.fr", "file": "archives/capture_cadastre_13_Argenson_c40c6d6d.jpg", "ext": "jpg", "download": "archives/capture_cadastre_13_Argenson_c40c6d6d.jpg"}, {"id": "A-019", "cat": "cadastre", "title": "Ortho IGN 1950-1960", "legend": "Volume principal déjà là ; pas de piscine.", "date": "1950-1960", "tag": "F", "source": "https://remonterletemps.ign.fr/comparer/?lon=0.603394&lat=46.975082&z=19", "source_label": "IGN Remonter le temps", "file": "archives/1950-1960_58d6da82.jpg", "ext": "jpg", "download": "archives/1950-1960_58d6da82.jpg"}, {"id": "A-020", "cat": "cadastre", "title": "Ortho IGN 1965-1980", "legend": "Suite chronologique aérienne.", "date": "1965-1980", "tag": "F", "source": "https://remonterletemps.ign.fr/comparer/?lon=0.603394&lat=46.975082&z=19", "source_label": "IGN Remonter le temps", "file": "archives/1965-1980_30b9486a.jpg", "ext": "jpg", "download": "archives/1965-1980_30b9486a.jpg"}, {"id": "A-021", "cat": "cadastre", "title": "Ortho IGN 2000-2005", "legend": "Piscine visible dans le jardin.", "date": "2000-2005", "tag": "F", "source": "https://remonterletemps.ign.fr/comparer/?lon=0.603394&lat=46.975082&z=19", "source_label": "IGN Remonter le temps", "file": "archives/2000-2005_8b35297e.jpg", "ext": "jpg", "download": "archives/2000-2005_8b35297e.jpg"}, {"id": "A-022", "cat": "cadastre", "title": "Ortho IGN 2006-2010", "legend": "Piscine toujours présente.", "date": "2006-2010", "tag": "F", "source": "https://remonterletemps.ign.fr/comparer/?lon=0.603394&lat=46.975082&z=19", "source_label": "IGN Remonter le temps", "file": "archives/2006-2010_cbf34170.jpg", "ext": "jpg", "download": "archives/2006-2010_cbf34170.jpg"}, {"id": "A-023", "cat": "cadastre", "title": "Ortho IGN 2011-2015", "legend": "État aérien récent.", "date": "2011-2015", "tag": "F", "source": "https://remonterletemps.ign.fr/comparer/?lon=0.603394&lat=46.975082&z=19", "source_label": "IGN Remonter le temps", "file": "archives/2011-2015_7a54cafe.jpg", "ext": "jpg", "download": "archives/2011-2015_7a54cafe.jpg"}, {"id": "A-024", "cat": "cadastre", "title": "Ortho IGN 2016-2020", "legend": "État aérien contemporain.", "date": "2016-2020", "tag": "F", "source": "https://remonterletemps.ign.fr/comparer/?lon=0.603394&lat=46.975082&z=19", "source_label": "IGN Remonter le temps", "file": "archives/2016-2020_0aca2472.jpg", "ext": "jpg", "download": "archives/2016-2020_0aca2472.jpg"}, {"id": "A-025", "cat": "cadastre", "title": "Ortho IGN aujourd'hui", "legend": "Couche actuelle du comparateur IGN.", "date": "récent", "tag": "F", "source": "https://remonterletemps.ign.fr/comparer/?lon=0.603394&lat=46.975082&z=19", "source_label": "IGN Remonter le temps", "file": "archives/Aujourdhui_7217cc15.jpg", "ext": "jpg", "download": "archives/Aujourdhui_7217cc15.jpg"}, {"id": "A-026", "cat": "cadastre", "title": "Plan remanié 1991 (AN)", "legend": "Plan cadastral remanié, commune des Ormes (contexte).", "date": "1991", "tag": "F", "source": "https://archives-deux-sevres-vienne.fr/", "source_label": "AD86 / plan remanié", "file": "archives/Les_Ormes_2256W767_plan_remanie_1991_AN_52ee05b8.jpg", "ext": "jpg", "download": "archives/Les_Ormes_2256W767_plan_remanie_1991_AN_52ee05b8.jpg"}, {"id": "A-027", "cat": "cadastre", "title": "Plan remanié 1991 (AO)", "legend": "Suite du plan remanié Les Ormes.", "date": "1991", "tag": "F", "source": "https://archives-deux-sevres-vienne.fr/", "source_label": "AD86 / plan remanié", "file": "archives/Les_Ormes_2256W768_plan_remanie_1991_AO_ef7d470f.jpg", "ext": "jpg", "download": "archives/Les_Ormes_2256W768_plan_remanie_1991_AO_ef7d470f.jpg"}, {"id": "A-028", "cat": "notarial", "title": "Vente 7 nov. 1890 - vigne Naintré", "legend": "Répertoire Lasserré : Salis achète une vigne « les Ormes », commune de Naintré - pas la villa.", "date": "1890", "tag": "F", "source": "https://archives-deux-sevres-vienne.fr/ark:/28387/vta39b1102e998b87df/daogrp/0/37", "source_label": "AD86 répertoire Lasserré", "file": "archives/4E46_485_n676_crop_af2d5d8c.jpg", "ext": "jpg", "download": "archives/4E46_485_n676_crop_af2d5d8c.jpg"}, {"id": "A-029", "cat": "notarial", "title": "Vue 37 du registre (zone nov. 1890)", "legend": "Page du répertoire autour de la vente du 7 novembre 1890.", "date": "1890", "tag": "F", "source": "https://archives-deux-sevres-vienne.fr/ark:/28387/vta39b1102e998b87df/daogrp/0/37", "source_label": "AD86", "file": "archives/4E46_485_vue037_nov7zone_89ec5404.jpg", "ext": "jpg", "download": "archives/4E46_485_vue037_nov7zone_89ec5404.jpg"}, {"id": "A-030", "cat": "notarial", "title": "Inventaire 1897 - lieu-dit et prix", "legend": "Même vigne rappelée à l'inventaire après décès : Naintré, ~1,5 ha, 3 300 F.", "date": "1897", "tag": "F", "source": "https://francearchives.gouv.fr/fr/facomponent/5c6be812e8374f0f70ae78d3b5c3288fb48117a9", "source_label": "FranceArchives", "file": "archives/FRAN_0159_22721_lieudit_prix_a0582ffe.jpg", "ext": "jpg", "download": "archives/FRAN_0159_22721_lieudit_prix_a0582ffe.jpg"}, {"id": "A-031", "cat": "notarial", "title": "Acquisition Tour de Naintré (1892)", "legend": "Salis adjudicataire de la Tour de Naintré (contexte régional).", "date": "1892", "tag": "F", "source": "https://latourdenaintre.fr/le-chateau/rodolphe-salis/", "source_label": "latourdenaintre.fr", "file": "archives/latour_acte_acquisition_Tour_Naintre_1892_40575f26.jpg", "ext": "jpg", "download": "archives/latour_acte_acquisition_Tour_Naintre_1892_40575f26.jpg"}, {"id": "A-032", "cat": "etat-civil", "title": "TD 1891 - Salsier Louis", "legend": "Naissance Salsier (pas Salis) aux Ormes, 1er avril 1891.", "date": "1891", "tag": "F", "source": "https://archives-deux-sevres-vienne.fr/ark:/28387/vtaf212deb2cbb96a4b", "source_label": "AD86 tables décennales", "file": "archives/TD_1883-92_Salsier_Louis_naissance_3245b4b7.jpg", "ext": "jpg", "download": "archives/TD_1883-92_Salsier_Louis_naissance_3245b4b7.jpg"}, {"id": "A-033", "cat": "etat-civil", "title": "TD naissances S 1893-1902", "legend": "Lettre S : aucun Salis sur cette décennie.", "date": "1893-1902", "tag": "F", "source": "https://archives-deux-sevres-vienne.fr/ark:/28387/vtae58beb875beb936c", "source_label": "AD86", "file": "archives/TD_1893-1902_naissances_S_a123ccde.jpg", "ext": "jpg", "download": "archives/TD_1893-1902_naissances_S_a123ccde.jpg"}, {"id": "A-034", "cat": "etat-civil", "title": "Mariage Audy × Coutard (1898)", "legend": "Ludger Eugène Audy × Camille Angèle Coutard, 16 avril 1898, Les Ormes.", "date": "1898", "tag": "F", "source": "https://archives-deux-sevres-vienne.fr/ark:/28387/vtae58beb875beb936c", "source_label": "AD86", "file": "archives/TD_1893-1902_mariages_Audy_Ludger_27e12e11.jpg", "ext": "jpg", "download": "archives/TD_1893-1902_mariages_Audy_Ludger_27e12e11.jpg"}, {"id": "A-035", "cat": "etat-civil", "title": "Recensement 1891 - René d'Argenson", "legend": "Place de la Halle : René d'Argenson. Pas de Salis sur le bourg consulté.", "date": "1891", "tag": "F", "source": "https://archives-deux-sevres-vienne.fr/ark:/28387/vta16b47523a5bb815d", "source_label": "AD86 recensement", "file": "archives/REC_1891_Rene_dArgenson_Place_Halle_15f542e0.jpg", "ext": "jpg", "download": "archives/REC_1891_Rene_dArgenson_Place_Halle_15f542e0.jpg"}, {"id": "A-036", "cat": "deglane", "title": "Portrait Henri Deglane", "legend": "Architecte (≤1905). Notice AGORHA : une villa aux Ormes en 1890.", "date": "≤1905", "tag": "F", "source": "https://commons.wikimedia.org/wiki/File:Henri_Deglane.jpg", "source_label": "Wikimedia Commons", "file": "archives/wiki_Henri_Deglane_portrait_500_266a3a0e.jpg", "ext": "jpg", "download": "archives/wiki_Henri_Deglane_portrait_500_266a3a0e.jpg"}, {"id": "A-037", "cat": "deglane", "title": "Grand Palais", "legend": "Contexte : Deglane parmi les architectes du Grand Palais.", "date": "début XXe", "tag": "S", "source": "https://agorha.inha.fr/ark:/54721/0cc32af3-1b5d-4c63-8d69-244e6863cdaf", "source_label": "AGORHA / contexte", "file": "archives/wiki_Grand_Palais_1024_9b6d27ce.jpg", "ext": "jpg", "download": "archives/wiki_Grand_Palais_1024_9b6d27ce.jpg"}, {"id": "A-038", "cat": "deglane", "title": "Comparaison - Villa Aigue-Marine (Royan)", "legend": "Autre villa attribuée à Deglane (comparaison stylistique, pas preuve locale).", "date": "n.d.", "tag": "S", "source": "https://agorha.inha.fr/ark:/54721/0cc32af3-1b5d-4c63-8d69-244e6863cdaf", "source_label": "Comparaison Deglane", "file": "archives/Villa_Aigue-Marine_Royan_ab64bfb7.jpg", "ext": "jpg", "download": "archives/Villa_Aigue-Marine_Royan_ab64bfb7.jpg"}, {"id": "A-039", "cat": "salis", "title": "Portrait Rodolphe Salis", "legend": "Fondateur du Chat Noir. Propriété de la villa : tradition locale seulement.", "date": "XIXe", "tag": "F", "source": "https://commons.wikimedia.org/wiki/File:Portrait_de_Rodolphe_Salis.jpg", "source_label": "Wikimedia Commons", "file": "archives/wiki_Portrait_de_Rodolphe_Salis_500_105f60c6.jpg", "ext": "jpg", "download": "archives/wiki_Portrait_de_Rodolphe_Salis_500_105f60c6.jpg"}, {"id": "A-040", "cat": "salis", "title": "Affiche Chat Noir (Steinlen)", "legend": "Contexte parisien du Chat Noir - pas un titre sur Les Ormes.", "date": "fin XIXe", "tag": "S", "source": "https://latourdenaintre.fr/le-chateau/rodolphe-salis/", "source_label": "Contexte Chat Noir", "file": "archives/wiki_Steinlen_chatnoir_500_daf90996.jpg", "ext": "jpg", "download": "archives/wiki_Steinlen_chatnoir_500_daf90996.jpg"}, {"id": "A-041", "cat": "salis", "title": "Façade du Chat Noir", "legend": "Cabaret parisien fondé par Salis.", "date": "n.d.", "tag": "S", "source": "https://latourdenaintre.fr/le-chateau/rodolphe-salis/", "source_label": "latourdenaintre.fr", "file": "archives/latour_facade_Chat_Noir_full_970ece28.jpg", "ext": "jpg", "download": "archives/latour_facade_Chat_Noir_full_970ece28.jpg"}, {"id": "A-042", "cat": "salis", "title": "Mariage Salis-Thiennet (1881)", "legend": "Acte de mariage (reproduction publiée).", "date": "1881", "tag": "F", "source": "https://latourdenaintre.fr/le-chateau/rodolphe-salis/", "source_label": "latourdenaintre.fr", "file": "archives/latour_Mariage_Salis_Thiennet_1881_9672e9f5.jpg", "ext": "jpg", "download": "archives/latour_Mariage_Salis_Thiennet_1881_9672e9f5.jpg"}, {"id": "A-043", "cat": "salis", "title": "Décès Salis (1897)", "legend": "Acte de décès à Naintré (reproduction publiée).", "date": "1897", "tag": "F", "source": "https://latourdenaintre.fr/le-chateau/rodolphe-salis/", "source_label": "latourdenaintre.fr", "file": "archives/latour_deces_Salis_1897_46b4dda3.jpg", "ext": "jpg", "download": "archives/latour_deces_Salis_1897_46b4dda3.jpg"}, {"id": "A-044", "cat": "contexte", "title": "Château des Ormes", "legend": "Domaine voisin ; la villa est dans les abords MH.", "date": "n.d.", "tag": "S", "source": "https://pop.culture.gouv.fr/notice/merimee/IA86000547", "source_label": "POP / Wikimedia", "file": "archives/wiki_Chateau_des_Ormes_500_2ab66378.jpg", "ext": "jpg", "download": "archives/wiki_Chateau_des_Ormes_500_2ab66378.jpg"}, {"id": "A-045", "cat": "contexte", "title": "Halle des Ormes", "legend": "Centre-bourg (Place de la Halle).", "date": "n.d.", "tag": "S", "source": "https://www.tourisme-chatellerault.fr/2020/09/08/les-ormes-la-surprise-du-chef-1-2/", "source_label": "Contexte bourg", "file": "archives/wiki_Les_Ormes_halle_500_5eeed0e7.jpg", "ext": "jpg", "download": "archives/wiki_Les_Ormes_halle_500_5eeed0e7.jpg"}, {"id": "A-046", "cat": "contexte", "title": "Église des Ormes", "legend": "Repère du bourg.", "date": "n.d.", "tag": "S", "source": "https://www.tourisme-chatellerault.fr/2020/09/08/les-ormes-la-surprise-du-chef-1-2/", "source_label": "Contexte bourg", "file": "archives/wiki_Les_Ormes_eglise_500_7ea154ba.jpg", "ext": "jpg", "download": "archives/wiki_Les_Ormes_eglise_500_7ea154ba.jpg"}, {"id": "A-047", "cat": "contexte", "title": "Château (OT) 1", "legend": "Domaine d'Argenson, reportage OT.", "date": "2020", "tag": "S", "source": "https://www.tourisme-chatellerault.fr/2020/09/08/les-ormes-la-surprise-du-chef-1-2/", "source_label": "OT", "file": "archives/OT2020_chateau_ormes_1_9f51b842.jpg", "ext": "jpg", "download": "archives/OT2020_chateau_ormes_1_9f51b842.jpg"}, {"id": "A-048", "cat": "contexte", "title": "Château (OT) 2", "legend": "Domaine d'Argenson, reportage OT.", "date": "2020", "tag": "S", "source": "https://www.tourisme-chatellerault.fr/2020/09/08/les-ormes-la-surprise-du-chef-1-2/", "source_label": "OT", "file": "archives/OT2020_chateau_ormes_2_ef26ba63.jpg", "ext": "jpg", "download": "archives/OT2020_chateau_ormes_2_ef26ba63.jpg"}, {"id": "A-049", "cat": "contexte", "title": "Raymond Audy", "legend": "Portrait publié (archives Tang Haywen). Piste Audy / Caroline au XXe.", "date": "XXe", "tag": "S", "source": "https://www.tanghaywenarchives.com/fr/friends/raymond-audy", "source_label": "Tang Haywen Archives", "file": "archives/TangHaywen_Raymond_Audy_0acbe661.jpg", "ext": "jpg", "download": "archives/TangHaywen_Raymond_Audy_0acbe661.jpg"}, {"id": "A-050", "cat": "plans", "title": "PLU - plan de zonage (PDF)", "legend": "Document d'urbanisme Les Ormes (2018). Mention « art déco » dans le PLU = libellé documentaire.", "date": "2018", "tag": "F", "source": "https://www.geoportail-urbanisme.gouv.fr/document/by-id/567b5bf6a339134f0bc34c21786068d0", "source_label": "Géoportail urbanisme", "file": "archives/PLU_86183_plan_sup_20180910_16b878bf.pdf", "ext": "pdf", "download": "archives/PLU_86183_plan_sup_20180910_16b878bf.pdf"}, {"id": "A-051", "cat": "plans", "title": "PLU - règlement graphique (PDF)", "legend": "Règlement graphique du PLU Les Ormes.", "date": "2018", "tag": "F", "source": "https://www.geoportail-urbanisme.gouv.fr/document/by-id/567b5bf6a339134f0bc34c21786068d0", "source_label": "Géoportail urbanisme", "file": "archives/PLU_86183_reglement_graphique_20180910_ff711b9a.pdf", "ext": "pdf", "download": "archives/PLU_86183_reglement_graphique_20180910_ff711b9a.pdf"}, {"id": "A-052", "cat": "plans", "title": "PLU - rapport de présentation (PDF)", "legend": "Rapport de présentation PLU (dont patrimoine bâti).", "date": "2018", "tag": "F", "source": "https://www.geoportail-urbanisme.gouv.fr/api/document/567b5bf6a339134f0bc34c21786068d0/files/86183_rapport_20180910.pdf", "source_label": "Géoportail urbanisme", "file": "archives/86183_rapport_20180910_904ec36e.pdf", "ext": "pdf", "download": "archives/86183_rapport_20180910_904ec36e.pdf"}]</script>
+<script>(() => {
+  const grid = document.getElementById("arch-grid");
+  if (!grid) return;
+
+  const search = document.getElementById("arch-q");
+  const catBox = document.getElementById("arch-cats");
+  const tagBox = document.getElementById("arch-tags");
+  const countEl = document.getElementById("arch-count");
+  const lb = document.querySelector(".lightbox");
+  const lbImg = lb?.querySelector("img");
+  const lbCap = lb?.querySelector(".lightbox-cap");
+
+  let activeCat = "all";
+  let activeTag = "all";
+
+  function esc(s) {
+    return String(s || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function renderFromJson() {
+    if (grid.children.length) return;
+    const raw = document.getElementById("arch-json");
+    if (!raw) return;
+    let data;
+    try {
+      data = JSON.parse(raw.textContent || "[]");
+    } catch {
+      return;
+    }
+    const catLab = Object.fromEntries(
+      [...(catBox?.querySelectorAll("[data-cat]") || [])].map((b) => [
+        b.dataset.cat,
+        b.textContent.trim(),
+      ])
+    );
+    grid.innerHTML = data
+      .map((it) => {
+        const isPdf = it.ext === "pdf";
+        const thumb = isPdf
+          ? `<div class="arch-thumb is-pdf" aria-hidden="true">PDF</div>`
+          : `<div class="arch-thumb"><img src="${esc(it.file)}" alt="${esc(it.title)}" loading="lazy"></div>`;
+        const search = [it.title, it.legend, it.date, it.cat, it.source_label, it.tag]
+          .join(" ")
+          .toLowerCase();
+        return `<article class="arch-card" data-id="${esc(it.id)}" data-cat="${esc(it.cat)}" data-tags="${esc(it.tag)}" data-search="${esc(search)}">
+  ${thumb}
+  <div class="arch-body">
+    <div class="arch-meta">
+      <span class="arch-cat">${esc(catLab[it.cat] || it.cat)}</span>
+      <span>${esc(it.date)}</span>
+      <span class="tag tag-${esc(it.tag.toLowerCase())}">[${esc(it.tag)}]</span>
+    </div>
+    <h2>${esc(it.title)}</h2>
+    <p class="arch-legend">${esc(it.legend)}</p>
+    <div class="arch-actions">
+      <a class="download" href="${esc(it.download)}" download>Télécharger</a>
+      <a href="${esc(it.source)}" target="_blank" rel="noopener">${esc(it.source_label)}</a>
+      ${isPdf ? "" : `<a href="${esc(it.file)}" target="_blank" rel="noopener">Plein écran</a>`}
+    </div>
+  </div>
+</article>`;
+      })
+      .join("");
+  }
+
+  function norm(s) {
+    return (s || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function apply() {
+    const cards = [...grid.querySelectorAll(".arch-card")];
+    const q = norm(search?.value || "");
+    let n = 0;
+    for (const card of cards) {
+      const cat = card.dataset.cat || "";
+      const tags = (card.dataset.tags || "").split(/\s+/).filter(Boolean);
+      const hay = norm(card.dataset.search || "");
+      const okCat = activeCat === "all" || cat === activeCat;
+      const okTag = activeTag === "all" || tags.includes(activeTag);
+      const okQ = !q || hay.includes(q);
+      const show = okCat && okTag && okQ;
+      card.classList.toggle("is-hidden", !show);
+      if (show) n += 1;
+    }
+    if (countEl) countEl.textContent = String(n);
+  }
+
+  function wireChips(box, kind) {
+    if (!box) return;
+    const first = box.querySelector(".chip");
+    if (first && !box.querySelector(".chip.is-on")) first.classList.add("is-on");
+    box.addEventListener("click", (e) => {
+      const btn = e.target.closest(".chip");
+      if (!btn) return;
+      box.querySelectorAll(".chip").forEach((c) => c.classList.remove("is-on"));
+      btn.classList.add("is-on");
+      if (kind === "cat") activeCat = btn.dataset.cat || "all";
+      if (kind === "tag") activeTag = btn.dataset.tag || "all";
+      apply();
+    });
+  }
+
+  function openLb(src, alt, cap) {
+    if (!lb || !lbImg) {
+      window.open(src, "_blank", "noopener");
+      return;
+    }
+    lbImg.src = src;
+    lbImg.alt = alt || "";
+    if (lbCap) lbCap.textContent = cap || "";
+    lb.classList.add("is-open");
+    lb.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeLb() {
+    lb?.classList.remove("is-open");
+    lb?.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  wireChips(catBox, "cat");
+  wireChips(tagBox, "tag");
+  search?.addEventListener("input", apply);
+
+  grid.addEventListener("click", (e) => {
+    const img = e.target.closest(".arch-thumb img");
+    if (!img) return;
+    e.preventDefault();
+    const card = img.closest(".arch-card");
+    const title = card?.querySelector("h2")?.textContent || img.alt;
+    const legend = card?.querySelector(".arch-legend")?.textContent || "";
+    openLb(img.currentSrc || img.src, img.alt, `${title} — ${legend}`);
+  });
+
+  lb?.addEventListener("click", (e) => {
+    if (e.target === lb || e.target.classList.contains("lightbox-close")) closeLb();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeLb();
+  });
+
+  renderFromJson();
+  apply();
+})();
+</script>
+</body>
+</html>

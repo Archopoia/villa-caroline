@@ -46,6 +46,48 @@ a {
 }
 a:hover { color: var(--accent); }
 
+/* Site nav (Monographie | Archives) */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 80;
+  background: rgba(244, 242, 238, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.site-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: min(100% - 1.5rem, 90rem);
+  margin: 0 auto;
+  padding: .65rem 0;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+}
+.site-brand {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+.site-tabs { display: flex; gap: .25rem; }
+.site-tabs a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: .88rem;
+  font-weight: 600;
+  padding: .45rem .75rem;
+  border: 1px solid transparent;
+}
+.site-tabs a:hover { color: var(--ink); }
+.site-tabs a.is-active {
+  color: var(--accent);
+  border-color: var(--line);
+  background: var(--panel);
+}
+
 /* Progress */
 .progress {
   position: fixed;
@@ -728,7 +770,7 @@ body.xref-parcelle .xref[data-xref="parcelle"] {
   .toc-box .toc-links { display: block; }
 }
 @media print {
-  .progress, .toc, .explore, .mobile-explore, .hero-cta, .back-top, .lightbox, .zoom-hint { display: none !important; }
+  .site-nav, .progress, .toc, .explore, .mobile-explore, .hero-cta, .back-top, .lightbox, .zoom-hint { display: none !important; }
   body { background: #fff; font-size: 10.5pt; }
   .hero { min-height: 180px; }
   .layout { display: block; width: auto; margin: 0; padding: 0 12mm; }
@@ -737,7 +779,16 @@ body.xref-parcelle .xref[data-xref="parcelle"] {
 }
 </style>
 </head>
-<body>
+<body class="mono-page">
+<header class="site-nav" role="navigation" aria-label="Sections du site">
+  <div class="site-nav-inner">
+    <a class="site-brand" href="index.html">Villa Caroline</a>
+    <nav class="site-tabs">
+      <a href="index.html" class="is-active">Monographie</a>
+      <a href="archives.html">Archives</a>
+    </nav>
+  </div>
+</header>
 <div class="progress" aria-hidden="true"><span></span></div>
 <header class="hero" style="background-image:url('assets/hero_facade.jpg')">
   <div class="hero-inner">
