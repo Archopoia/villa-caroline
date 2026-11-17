@@ -139,11 +139,6 @@ a:hover { color: var(--accent); }
   padding: 2rem 0 5rem;
   align-items: start;
 }
-.article {
-  max-width: var(--measure);
-  width: 100%;
-  justify-self: center;
-}
 .toc, .explore {
   position: sticky;
   top: 1.4rem;
@@ -221,6 +216,9 @@ a:hover { color: var(--accent); }
 /* Article */
 .article {
   min-width: 0;
+  max-width: var(--measure);
+  width: 100%;
+  justify-self: center;
   text-align: justify;
   text-justify: inter-word;
   hyphens: auto;
