@@ -21,8 +21,8 @@
   --s: #9a6b12;
   --h: #2a5a8a;
   --av: #6b6f6c;
-  --measure: 40rem;
-  --rail: 15.5rem;
+  --measure: 46rem;
+  --rail: 12.5rem;
   --flash: #d8e8c8;
 }
 *, *::before, *::after { box-sizing: border-box; }
@@ -131,11 +131,18 @@ a:hover { color: var(--accent); }
 /* Layout */
 .layout {
   display: grid;
-  grid-template-columns: var(--rail) minmax(0, var(--measure)) var(--rail);
-  gap: 2rem 2.25rem;
-  width: min(100% - 2rem, 72rem);
+  grid-template-columns: var(--rail) minmax(0, 1fr) var(--rail);
+  column-gap: clamp(1.75rem, 3.5vw, 3.25rem);
+  row-gap: 1.5rem;
+  width: min(100% - 2.5rem, 90rem);
   margin: 0 auto;
   padding: 2rem 0 5rem;
+  align-items: start;
+}
+.article {
+  max-width: var(--measure);
+  width: 100%;
+  justify-self: center;
 }
 .toc, .explore {
   position: sticky;
@@ -212,7 +219,13 @@ a:hover { color: var(--accent); }
 .quick-links a:hover { color: var(--link); }
 
 /* Article */
-.article { min-width: 0; text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto; }
+.article {
+  min-width: 0;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
 .article > *:first-child { margin-top: 0; }
 .article h2, .article h3, .article .tag-legend, .article table,
 .article .tag-legend p, .article figcaption, .article p > em,
@@ -566,9 +579,10 @@ body.xref-parcelle .xref[data-xref="parcelle"] {
 }
 .back-top:hover { transform: translateY(-2px); border-color: var(--accent); }
 
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
   .layout {
-    grid-template-columns: var(--rail) minmax(0, 1fr);
+    grid-template-columns: 11.5rem minmax(0, 1fr);
+    width: min(100% - 2rem, 78rem);
   }
   .explore { display: none; }
   .mobile-explore {
@@ -580,11 +594,12 @@ body.xref-parcelle .xref[data-xref="parcelle"] {
     border-bottom: 1px solid var(--line);
   }
 }
-@media (min-width: 1101px) {
+@media (min-width: 1201px) {
   .mobile-explore { display: none; }
 }
 @media (max-width: 900px) {
-  .layout { grid-template-columns: 1fr; gap: 1rem; }
+  .layout { grid-template-columns: 1fr; gap: 1rem; width: min(100% - 1.25rem, 46rem); }
+  .article { justify-self: stretch; max-width: none; }
   .toc {
     position: static;
     display: flex;
