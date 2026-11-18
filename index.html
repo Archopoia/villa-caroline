@@ -1610,7 +1610,7 @@ body.is-editing .article {
 
 </script>
 <!-- villa-history-editor -->
-<script>/* History tracks: incremental saves; prose red/green view (not git UI) */
+<script>/* History tracks: incremental saves; soft paragraph/sentence highlights (site formatting) */
 (() => {
   const DB_NAME = "villa-caroline-history";
   const DB_VER = 1;
@@ -1679,7 +1679,11 @@ body.is-editing .article {
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
 
-  const tokenize = (text) => String(text || "").split(/(\s+)/).filter((t) => t.length);
+  const norm = (t) =>
+    String(t || "")
+      .replace(/\u00a0/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
 
   const lcsOps = (a, b) => {
     const n = a.length;
@@ -1695,186 +1699,157 @@ body.is-editing .article {
     let j = 0;
     while (i < n && j < m) {
       if (a[i] === b[j]) {
-        ops.push({ op: "eq", text: a[i] });
+        ops.push({ op: "eq", ai: i, bi: j, text: a[i] });
         i++;
         j++;
       } else if (dp[i + 1][j] >= dp[i][j + 1]) {
-        ops.push({ op: "del", text: a[i++] });
+        ops.push({ op: "del", ai: i, text: a[i++] });
       } else {
-        ops.push({ op: "ins", text: b[j++] });
+        ops.push({ op: "ins", bi: j, text: b[j++] });
       }
     }
-    while (i < n) ops.push({ op: "del", text: a[i++] });
-    while (j < m) ops.push({ op: "ins", text: b[j++] });
+    while (i < n) ops.push({ op: "del", ai: i, text: a[i++] });
+    while (j < m) ops.push({ op: "ins", bi: j, text: b[j++] });
     return ops;
   };
 
-  const diffIncremental = (oldText, newText) => {
-    const a = String(oldText || "").replace(/\r\n/g, "\n").split("\n");
-    const b = String(newText || "").replace(/\r\n/g, "\n").split("\n");
-    const ops = lcsOps(a, b);
-    let stats = { delete: 0, insert: 0 };
-    const hunks = [];
-    ops.forEach((o) => {
-      if (o.op === "del") {
-        stats.delete++;
-        hunks.push(o);
-      } else if (o.op === "ins") {
-        stats.insert++;
-        hunks.push(o);
-      }
-    });
-    return { hunks, stats, empty: stats.delete === 0 && stats.insert === 0 };
+  const splitSentences = (text) => {
+    const t = String(text || "").trim();
+    if (!t) return [];
+    // Keep separators attached to previous sentence
+    const parts = t.split(/(?<=[.!?…])\s+(?=[A-ZÀÂÄÉÈÊËÏÎÔÙÛÜÇ«"0-9])/);
+    return parts.map((p) => p.trim()).filter(Boolean);
   };
 
-  /** Word-level inline HTML: deleted / added text only marked. */
-  const wordDiffInline = (before, after) => {
-    const ops = lcsOps(tokenize(before), tokenize(after));
-    return ops
-      .map((o) => {
-        if (o.op === "eq") return esc(o.text);
-        if (o.op === "del") return `<del class="hist-del">${esc(o.text)}</del>`;
-        return `<ins class="hist-ins">${esc(o.text)}</ins>`;
-      })
-      .join("");
+  /** Soft sentence wash inside one paragraph (no word chopping). */
+  const sentenceDiffHtml = (oldText, newText) => {
+    const a = splitSentences(oldText);
+    const b = splitSentences(newText);
+    if (!a.length && !b.length) return "";
+    if (!a.length) {
+      return `<span class="hist-sent hist-sent-ins">${esc(newText)}</span>`;
+    }
+    if (!b.length) {
+      return `<span class="hist-sent hist-sent-del">${esc(oldText)}</span>`;
+    }
+    // If almost the whole para changed as one unit, one wash each
+    if (a.length <= 1 && b.length <= 1) {
+      return (
+        `<span class="hist-sent hist-sent-del">${esc(oldText)}</span>` +
+        `<span class="hist-sent hist-sent-ins">${esc(newText)}</span>`
+      );
+    }
+    const ops = lcsOps(a, b);
+    const out = [];
+    for (let i = 0; i < ops.length; i++) {
+      const op = ops[i];
+      const next = ops[i + 1];
+      if (op.op === "eq") {
+        out.push(`<span class="hist-sent hist-sent-same">${esc(op.text)}</span> `);
+      } else if (op.op === "del" && next && next.op === "ins") {
+        out.push(`<span class="hist-sent hist-sent-del">${esc(op.text)}</span> `);
+        out.push(`<span class="hist-sent hist-sent-ins">${esc(next.text)}</span> `);
+        i++;
+      } else if (op.op === "del") {
+        out.push(`<span class="hist-sent hist-sent-del">${esc(op.text)}</span> `);
+      } else {
+        out.push(`<span class="hist-sent hist-sent-ins">${esc(op.text)}</span> `);
+      }
+    }
+    return out.join("").trim();
   };
+
+  const wrapBlock = (el, kind, innerHtml) => {
+    const tag = (el?.tagName || "P").toLowerCase();
+    const cls = ["hist-block", `hist-block-${kind}`];
+    if (el?.className) cls.push(el.className);
+    return `<${tag} class="${esc(cls.join(" "))}">${innerHtml}</${tag}>`;
+  };
+
+  const cloneKeep = (el) => el.outerHTML;
 
   /**
-   * Build a formatted article HTML from before/after snapshots.
-   * Unchanged blocks keep after markup; changed blocks get inline red/green words.
+   * Formatted article: unchanged blocks keep site HTML;
+   * changed paragraphs get soft full-block wash (+ sentence wash inside replaces).
    */
   const proseDiffHtml = (beforeHtml, afterHtml) => {
-    if (!afterHtml && !beforeHtml) return "";
-    if (!beforeHtml && afterHtml) return afterHtml;
-    if (beforeHtml && !afterHtml) return beforeHtml;
-
-    const wrap = (html) => {
+    const parse = (html) => {
       const d = document.createElement("div");
       d.innerHTML = html || "";
       return [...d.children];
     };
+    const before = parse(beforeHtml);
+    const after = parse(afterHtml);
+    if (!before.length && after.length) return afterHtml || "";
+    if (before.length && !after.length) {
+      return before.map((el) => wrapBlock(el, "del", el.innerHTML)).join("\n");
+    }
 
-    const before = wrap(beforeHtml);
-    const after = wrap(afterHtml);
-    const aKeys = before.map((el) => (el.innerText || "").trim());
-    const bKeys = after.map((el) => (el.innerText || "").trim());
+    const aKeys = before.map((el) => norm(el.innerText));
+    const bKeys = after.map((el) => norm(el.innerText));
     const ops = lcsOps(aKeys, bKeys);
-
-    // Map equal texts to after elements (prefer richer markup)
-    const afterByText = new Map();
-    after.forEach((el) => {
-      const t = (el.innerText || "").trim();
-      if (t && !afterByText.has(t)) afterByText.set(t, el);
-    });
-    const beforeByText = new Map();
-    before.forEach((el) => {
-      const t = (el.innerText || "").trim();
-      if (t && !beforeByText.has(t)) beforeByText.set(t, el);
-    });
-
     const out = [];
-    let bi = 0;
-    let ai = 0;
-    // Walk original children with ops on text keys — rebuild using indices
-    // Simpler: walk ops and consume from arrays
-    const bQueue = [...before];
-    const aQueue = [...after];
 
-    // Rebuild ops against parallel queues by shifting
-    const bTexts = bQueue.map((el) => (el.innerText || "").trim());
-    const aTexts = aQueue.map((el) => (el.innerText || "").trim());
-    const blockOps = lcsOps(bTexts, aTexts);
-
-    let ib = 0;
-    let ia = 0;
-    for (const op of blockOps) {
+    for (let i = 0; i < ops.length; i++) {
+      const op = ops[i];
+      const next = ops[i + 1];
       if (op.op === "eq") {
-        out.push(aQueue[ia].outerHTML);
-        ib++;
-        ia++;
-      } else if (op.op === "del") {
-        const el = bQueue[ib];
-        const tag = (el.tagName || "P").toLowerCase();
-        const cls = el.className ? ` class="${esc(el.className)}"` : "";
-        out.push(`<${tag}${cls}><del class="hist-del">${esc(el.innerText)}</del></${tag}>`);
-        ib++;
-      } else if (op.op === "ins") {
-        const el = aQueue[ia];
-        const tag = (el.tagName || "P").toLowerCase();
-        const cls = el.className ? ` class="${esc(el.className)}"` : "";
-        // Prefer cloning structure with only text marked if short; else wrap whole
-        out.push(`<${tag}${cls}><ins class="hist-ins">${el.innerHTML}</ins></${tag}>`);
-        ia++;
-      }
-    }
-
-    // Also handle replace pairs: when del immediately followed by ins on similar blocks,
-    // merge into one block with word diff (second pass)
-    const merged = [];
-    for (let i = 0; i < blockOps.length; i++) {
-      const op = blockOps[i];
-      const next = blockOps[i + 1];
-      if (op.op === "del" && next && next.op === "ins") {
-        const oldEl = beforeByText.get(op.text) || bQueue.find((e) => (e.innerText || "").trim() === op.text);
-        const newEl = afterByText.get(next.text) || aQueue.find((e) => (e.innerText || "").trim() === next.text);
-        const tag = ((newEl || oldEl)?.tagName || "P").toLowerCase();
-        const cls = (newEl || oldEl)?.className ? ` class="${esc((newEl || oldEl).className)}"` : "";
-        const inline = wordDiffInline(op.text, next.text);
-        merged.push({ html: `<${tag}${cls}>${inline}</${tag}>` });
-        i++;
-      } else if (op.op === "eq") {
-        const el = afterByText.get(op.text);
-        merged.push({ html: el ? el.outerHTML : `<p>${esc(op.text)}</p>` });
-      } else if (op.op === "del") {
-        merged.push({
-          html: `<p><del class="hist-del">${esc(op.text)}</del></p>`,
-        });
-      } else {
-        const el = afterByText.get(op.text);
-        if (el) {
-          merged.push({
-            html: el.outerHTML.replace(
-              /^(<[a-z0-9]+)([^>]*>)([\s\S]*)(<\/[a-z0-9]+>)$/i,
-              (_, a, b, mid, c) => `${a}${b}<ins class="hist-ins">${mid}</ins>${c}`
-            ),
-          });
+        out.push(cloneKeep(after[op.bi]));
+      } else if (op.op === "del" && next && next.op === "ins") {
+        const oldEl = before[op.ai];
+        const newEl = after[next.bi];
+        const oldT = oldEl?.innerText || op.text;
+        const newT = newEl?.innerText || next.text;
+        // Media / tables / headings: show both as full soft blocks (keep markup)
+        const isRich =
+          newEl &&
+          /^(H[1-6]|TABLE|UL|OL|DIV|FIGURE|DETAILS)$/i.test(newEl.tagName);
+        if (isRich || /figure-wrap|compare|tag-legend|source-line/i.test(newEl?.className || "")) {
+          out.push(wrapBlock(oldEl, "del", oldEl.innerHTML));
+          out.push(wrapBlock(newEl, "ins", newEl.innerHTML));
         } else {
-          merged.push({ html: `<p><ins class="hist-ins">${esc(op.text)}</ins></p>` });
+          // One flowing paragraph: previous sentence(s) soft-red, new soft-green
+          const inner = sentenceDiffHtml(oldT, newT);
+          out.push(wrapBlock(newEl || oldEl, "changed", inner));
         }
+        i++;
+      } else if (op.op === "del") {
+        const el = before[op.ai];
+        out.push(wrapBlock(el, "del", el.innerHTML));
+      } else if (op.op === "ins") {
+        const el = after[op.bi];
+        out.push(wrapBlock(el, "ins", el.innerHTML));
       }
     }
-
-    return merged.map((m) => m.html).join("\n");
+    return out.join("\n");
   };
 
-  /** Fallback when only line hunks exist (seed / old tracks). */
+  /** Last resort if only plain hunks (should be rare). */
   const proseFromHunks = (hunks) => {
     const parts = [];
-    let bufDel = [];
-    let bufIns = [];
+    let dels = [];
+    let inss = [];
     const flush = () => {
-      if (bufDel.length || bufIns.length) {
-        const oldT = bufDel.join("\n");
-        const newT = bufIns.join("\n");
-        if (oldT && newT) {
-          parts.push(`<p>${wordDiffInline(oldT, newT)}</p>`);
-        } else if (oldT) {
-          parts.push(`<p><del class="hist-del">${esc(oldT)}</del></p>`);
-        } else if (newT) {
-          parts.push(`<p><ins class="hist-ins">${esc(newT)}</ins></p>`);
-        }
-        bufDel = [];
-        bufIns = [];
+      if (!dels.length && !inss.length) return;
+      const oldT = dels.join(" ").trim();
+      const newT = inss.join(" ").trim();
+      if (oldT && newT) {
+        parts.push(`<p class="hist-block hist-block-changed">${sentenceDiffHtml(oldT, newT)}</p>`);
+      } else if (oldT) {
+        parts.push(`<p class="hist-block hist-block-del">${esc(oldT)}</p>`);
+      } else if (newT) {
+        parts.push(`<p class="hist-block hist-block-ins">${esc(newT)}</p>`);
       }
+      dels = [];
+      inss = [];
     };
     (hunks || []).forEach((h) => {
       if (h.op === "eq") {
         flush();
-        if ((h.text || "").trim()) parts.push(`<p>${esc(h.text)}</p>`);
       } else if (h.op === "del") {
-        bufDel.push(h.text);
+        dels.push(h.text);
       } else if (h.op === "ins") {
-        bufIns.push(h.text);
+        inss.push(h.text);
       }
     });
     flush();
@@ -1885,8 +1860,27 @@ body.is-editing .article {
     if (track?.beforeHtml && track?.snapshotHtml) {
       return proseDiffHtml(track.beforeHtml, track.snapshotHtml);
     }
+    if (track?.snapshotHtml && !track?.beforeHtml) return track.snapshotHtml;
     if (track?.hunks?.length) return proseFromHunks(track.hunks);
     return track?.snapshotHtml || "";
+  };
+
+  const diffIncremental = (oldText, newText) => {
+    const a = String(oldText || "").replace(/\r\n/g, "\n").split("\n");
+    const b = String(newText || "").replace(/\r\n/g, "\n").split("\n");
+    const ops = lcsOps(a, b);
+    const hunks = [];
+    const stats = { delete: 0, insert: 0 };
+    ops.forEach((o) => {
+      if (o.op === "del") {
+        stats.delete++;
+        hunks.push({ op: "del", text: o.text });
+      } else if (o.op === "ins") {
+        stats.insert++;
+        hunks.push({ op: "ins", text: o.text });
+      }
+    });
+    return { hunks, stats, empty: stats.delete === 0 && stats.insert === 0 };
   };
 
   const uid = () => {
@@ -1958,10 +1952,15 @@ body.is-editing .article {
   const ensureSeed = async (seedTrack) => {
     if (!seedTrack?.id) return;
     const all = await idbGetAll();
-    if (all.some((t) => t.id === seedTrack.id)) {
-      // upgrade seed with html if missing
-      const existing = all.find((t) => t.id === seedTrack.id);
-      if (existing && !existing.snapshotHtml && seedTrack.snapshotHtml) {
+    const existing = all.find((t) => t.id === seedTrack.id);
+    if (existing) {
+      // Force-upgrade seed HTML when rebuild improved snapshots
+      if (
+        seedTrack.snapshotHtml &&
+        (!existing.snapshotHtml ||
+          !existing.beforeHtml ||
+          (seedTrack.beforeHtml && existing.beforeHtml !== seedTrack.beforeHtml))
+      ) {
         await idbPut({ ...existing, ...seedTrack });
       }
       return;
@@ -1977,7 +1976,6 @@ body.is-editing .article {
   window.VillaHistory = {
     articlePlain,
     diffIncremental,
-    wordDiffInline,
     proseDiffHtml,
     proseFromHunks,
     renderTrackProse,
