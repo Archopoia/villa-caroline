@@ -1554,15 +1554,16 @@ body.is-editing .article {
     lb?.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
   };
-  $$(".figure-wrap img, .article > p > img").forEach((img) => {
-    if (img.closest(".compare")) return;
-    img.addEventListener("click", () => {
-      const cap =
-        img.closest(".figure-wrap")?.nextElementSibling?.textContent?.trim() ||
-        img.alt ||
-        "";
-      openLb(img.src, cap);
-    });
+  /* Lightbox — delegated so restored article HTML still works */
+  const articleRoot = $(".article");
+  articleRoot?.addEventListener("click", (e) => {
+    const img = e.target.closest(".figure-wrap img, .article > p > img");
+    if (!img || img.closest(".compare")) return;
+    const cap =
+      img.closest(".figure-wrap")?.nextElementSibling?.textContent?.trim() ||
+      img.alt ||
+      "";
+    openLb(img.src, cap);
   });
   lb?.addEventListener("click", (e) => {
     if (e.target === lb || e.target.classList.contains("lightbox-close")) closeLb();
@@ -1571,41 +1572,47 @@ body.is-editing .article {
     if (e.key === "Escape") closeLb();
   });
 
-  /* Compare sliders (touch + mouse) */
-  $$(".compare").forEach((box) => {
-    const top = $(".compare-top", box);
-    const handle = $(".compare-handle", box);
-    if (!top || !handle) return;
-    let dragging = false;
-    const setPos = (clientX) => {
-      const rect = box.getBoundingClientRect();
-      let x = ((clientX - rect.left) / rect.width) * 100;
-      x = Math.max(2, Math.min(98, x));
-      top.style.clipPath = `inset(0 ${100 - x}% 0 0)`;
-      handle.style.left = `${x}%`;
-    };
-    const start = (e) => {
-      dragging = true;
-      try {
-        box.setPointerCapture?.(e.pointerId);
-      } catch (_) {
-        /* ignore */
-      }
-      setPos(e.clientX);
-      e.preventDefault();
-    };
-    const move = (e) => {
-      if (!dragging) return;
-      setPos(e.clientX);
-    };
-    const end = () => {
-      dragging = false;
-    };
-    box.addEventListener("pointerdown", start, { passive: false });
-    box.addEventListener("pointermove", move, { passive: true });
-    box.addEventListener("pointerup", end);
-    box.addEventListener("pointercancel", end);
-  });
+  /* Compare sliders (touch + mouse) — rebindable after article restore */
+  const bindCompare = (root = document) => {
+    $$(".compare", root).forEach((box) => {
+      if (box.dataset.compareBound) return;
+      box.dataset.compareBound = "1";
+      const top = $(".compare-top", box);
+      const handle = $(".compare-handle", box);
+      if (!top || !handle) return;
+      let dragging = false;
+      const setPos = (clientX) => {
+        const rect = box.getBoundingClientRect();
+        let x = ((clientX - rect.left) / rect.width) * 100;
+        x = Math.max(2, Math.min(98, x));
+        top.style.clipPath = `inset(0 ${100 - x}% 0 0)`;
+        handle.style.left = `${x}%`;
+      };
+      const start = (e) => {
+        dragging = true;
+        try {
+          box.setPointerCapture?.(e.pointerId);
+        } catch (_) {
+          /* ignore */
+        }
+        setPos(e.clientX);
+        e.preventDefault();
+      };
+      const move = (e) => {
+        if (!dragging) return;
+        setPos(e.clientX);
+      };
+      const end = () => {
+        dragging = false;
+      };
+      box.addEventListener("pointerdown", start, { passive: false });
+      box.addEventListener("pointermove", move, { passive: true });
+      box.addEventListener("pointerup", end);
+      box.addEventListener("pointercancel", end);
+    });
+  };
+  bindCompare();
+  document.addEventListener("villa:article-restored", () => bindCompare(articleRoot || document));
 })();
 
 </script>
@@ -1991,7 +1998,7 @@ body.is-editing .article {
   };
 })();
 </script>
-<script>/* Review/edit monography → Save creates an incremental history track */
+<script>/* Review/edit monography → Save updates main page + incremental history track */
 (() => {
   if (!document.body.classList.contains("mono-page")) return;
   const H = window.VillaHistory;
@@ -2004,6 +2011,31 @@ body.is-editing .article {
   let editing = false;
   let snapshotBefore = "";
   let htmlBefore = "";
+
+  const applyArticleHtml = (html) => {
+    if (!html) return false;
+    article.innerHTML = html;
+    document.dispatchEvent(new CustomEvent("villa:article-restored"));
+    return true;
+  };
+
+  /** Restore last saved monography so tab switches don’t wipe edits. */
+  const restoreCurrent = async () => {
+    let html = await H.idbMetaGet("headHtml");
+    if (!html && (await H.probeApi())) {
+      try {
+        const r = await fetch(`${H.API_BASE}/api/current`);
+        if (r.ok) {
+          const data = await r.json();
+          html = data.html || null;
+          if (html) await H.idbMetaSet("headHtml", html);
+        }
+      } catch (_) {
+        /* ignore */
+      }
+    }
+    if (html) applyArticleHtml(html);
+  };
 
   const bar = document.createElement("div");
   bar.className = "edit-bar";
@@ -2037,12 +2069,8 @@ body.is-editing .article {
     btnSave.hidden = !on;
     btnCancel.hidden = !on;
     labelInput.hidden = !on;
-    if (on) {
-      article.focus({ preventScroll: true });
-      setStatus("");
-    } else {
-      setStatus("");
-    }
+    if (on) article.focus({ preventScroll: true });
+    else setStatus("");
   };
 
   btnToggle.addEventListener("click", async () => {
@@ -2054,6 +2082,7 @@ body.is-editing .article {
 
   btnCancel.addEventListener("click", () => {
     article.innerHTML = htmlBefore;
+    document.dispatchEvent(new CustomEvent("villa:article-restored"));
     setEditing(false);
   });
 
@@ -2076,11 +2105,14 @@ body.is-editing .article {
         btnSave.disabled = false;
         return;
       }
+      // Persist as the live monography (survives tab changes)
+      await H.idbMetaSet("headHtml", htmlSnap);
+      await H.idbMetaSet("headPlain", plain);
       snapshotBefore = plain;
       htmlBefore = htmlSnap;
       labelInput.value = "";
       setEditing(false);
-      setStatus("Enregistré.", true);
+      setStatus("Enregistré sur la monographie.", true);
       try {
         localStorage.setItem("villa-history-ping", String(Date.now()));
       } catch (_) {
@@ -2101,6 +2133,8 @@ body.is-editing .article {
     }
     if (e.key === "Escape") btnCancel.click();
   });
+
+  restoreCurrent();
 })();
 </script>
 </body>
