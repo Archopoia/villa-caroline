@@ -1610,7 +1610,7 @@ body.is-editing .article {
 
 </script>
 <!-- villa-history-editor -->
-<script>/* Shared history: incremental tracks only (this edit’s −/+), IndexedDB + optional local API */
+<script>/* History tracks: incremental saves; prose red/green view (not git UI) */
 (() => {
   const DB_NAME = "villa-caroline-history";
   const DB_VER = 1;
@@ -1673,11 +1673,15 @@ body.is-editing .article {
     });
   };
 
-  /** Line diff → only changed lines (+ optional context). */
-  const diffIncremental = (oldText, newText, context = 1) => {
-    const a = String(oldText || "").replace(/\r\n/g, "\n").split("\n");
-    const b = String(newText || "").replace(/\r\n/g, "\n").split("\n");
-    // Myers-ish via LCS DP for moderate sizes
+  const esc = (s) =>
+    String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+
+  const tokenize = (text) => String(text || "").split(/(\s+)/).filter((t) => t.length);
+
+  const lcsOps = (a, b) => {
     const n = a.length;
     const m = b.length;
     const dp = Array.from({ length: n + 1 }, () => new Uint32Array(m + 1));
@@ -1702,68 +1706,188 @@ body.is-editing .article {
     }
     while (i < n) ops.push({ op: "del", text: a[i++] });
     while (j < m) ops.push({ op: "ins", text: b[j++] });
-
-    const changedIdx = new Set();
-    ops.forEach((o, idx) => {
-      if (o.op !== "eq") changedIdx.add(idx);
-    });
-    const keep = new Set();
-    changedIdx.forEach((idx) => {
-      for (let k = Math.max(0, idx - context); k <= Math.min(ops.length - 1, idx + context); k++) {
-        keep.add(k);
-      }
-    });
-
-    const hunks = [];
-    let stats = { delete: 0, insert: 0, equal: 0 };
-    ops.forEach((o, idx) => {
-      if (o.op === "del") stats.delete++;
-      else if (o.op === "ins") stats.insert++;
-      else stats.equal++;
-      if (!keep.has(idx) && o.op === "eq") return;
-      // skip pure eq outside context
-      if (o.op === "eq" && !changedIdx.has(idx) && ![...changedIdx].some((c) => Math.abs(c - idx) <= context)) {
-        return;
-      }
-      if (o.op === "eq" && !keep.has(idx)) return;
-      hunks.push(o);
-    });
-
-    // tighten: only keep eq that are adjacent to changes
-    const filtered = [];
-    for (let k = 0; k < ops.length; k++) {
-      if (ops[k].op !== "eq") {
-        filtered.push(ops[k]);
-        continue;
-      }
-      let near = false;
-      for (let t = 1; t <= context; t++) {
-        if (ops[k - t] && ops[k - t].op !== "eq") near = true;
-        if (ops[k + t] && ops[k + t].op !== "eq") near = true;
-      }
-      if (near) filtered.push(ops[k]);
-    }
-
-    return {
-      hunks: filtered,
-      stats: { delete: stats.delete, insert: stats.insert },
-      empty: stats.delete === 0 && stats.insert === 0,
-    };
+    return ops;
   };
 
-  const renderHunksHtml = (hunks) =>
-    (hunks || [])
-      .map((h) => {
-        const cls = h.op === "del" ? "diff-del" : h.op === "ins" ? "diff-ins" : "diff-eq";
-        const g = h.op === "del" ? "−" : h.op === "ins" ? "+" : " ";
-        const esc = (s) =>
-          String(s)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;");
-        return `<div class="diff-line ${cls}"><span class="diff-gutter">${g}</span><code>${esc(h.text) || " "}</code></div>`;
+  const diffIncremental = (oldText, newText) => {
+    const a = String(oldText || "").replace(/\r\n/g, "\n").split("\n");
+    const b = String(newText || "").replace(/\r\n/g, "\n").split("\n");
+    const ops = lcsOps(a, b);
+    let stats = { delete: 0, insert: 0 };
+    const hunks = [];
+    ops.forEach((o) => {
+      if (o.op === "del") {
+        stats.delete++;
+        hunks.push(o);
+      } else if (o.op === "ins") {
+        stats.insert++;
+        hunks.push(o);
+      }
+    });
+    return { hunks, stats, empty: stats.delete === 0 && stats.insert === 0 };
+  };
+
+  /** Word-level inline HTML: deleted / added text only marked. */
+  const wordDiffInline = (before, after) => {
+    const ops = lcsOps(tokenize(before), tokenize(after));
+    return ops
+      .map((o) => {
+        if (o.op === "eq") return esc(o.text);
+        if (o.op === "del") return `<del class="hist-del">${esc(o.text)}</del>`;
+        return `<ins class="hist-ins">${esc(o.text)}</ins>`;
       })
-      .join("\n");
+      .join("");
+  };
+
+  /**
+   * Build a formatted article HTML from before/after snapshots.
+   * Unchanged blocks keep after markup; changed blocks get inline red/green words.
+   */
+  const proseDiffHtml = (beforeHtml, afterHtml) => {
+    if (!afterHtml && !beforeHtml) return "";
+    if (!beforeHtml && afterHtml) return afterHtml;
+    if (beforeHtml && !afterHtml) return beforeHtml;
+
+    const wrap = (html) => {
+      const d = document.createElement("div");
+      d.innerHTML = html || "";
+      return [...d.children];
+    };
+
+    const before = wrap(beforeHtml);
+    const after = wrap(afterHtml);
+    const aKeys = before.map((el) => (el.innerText || "").trim());
+    const bKeys = after.map((el) => (el.innerText || "").trim());
+    const ops = lcsOps(aKeys, bKeys);
+
+    // Map equal texts to after elements (prefer richer markup)
+    const afterByText = new Map();
+    after.forEach((el) => {
+      const t = (el.innerText || "").trim();
+      if (t && !afterByText.has(t)) afterByText.set(t, el);
+    });
+    const beforeByText = new Map();
+    before.forEach((el) => {
+      const t = (el.innerText || "").trim();
+      if (t && !beforeByText.has(t)) beforeByText.set(t, el);
+    });
+
+    const out = [];
+    let bi = 0;
+    let ai = 0;
+    // Walk original children with ops on text keys — rebuild using indices
+    // Simpler: walk ops and consume from arrays
+    const bQueue = [...before];
+    const aQueue = [...after];
+
+    // Rebuild ops against parallel queues by shifting
+    const bTexts = bQueue.map((el) => (el.innerText || "").trim());
+    const aTexts = aQueue.map((el) => (el.innerText || "").trim());
+    const blockOps = lcsOps(bTexts, aTexts);
+
+    let ib = 0;
+    let ia = 0;
+    for (const op of blockOps) {
+      if (op.op === "eq") {
+        out.push(aQueue[ia].outerHTML);
+        ib++;
+        ia++;
+      } else if (op.op === "del") {
+        const el = bQueue[ib];
+        const tag = (el.tagName || "P").toLowerCase();
+        const cls = el.className ? ` class="${esc(el.className)}"` : "";
+        out.push(`<${tag}${cls}><del class="hist-del">${esc(el.innerText)}</del></${tag}>`);
+        ib++;
+      } else if (op.op === "ins") {
+        const el = aQueue[ia];
+        const tag = (el.tagName || "P").toLowerCase();
+        const cls = el.className ? ` class="${esc(el.className)}"` : "";
+        // Prefer cloning structure with only text marked if short; else wrap whole
+        out.push(`<${tag}${cls}><ins class="hist-ins">${el.innerHTML}</ins></${tag}>`);
+        ia++;
+      }
+    }
+
+    // Also handle replace pairs: when del immediately followed by ins on similar blocks,
+    // merge into one block with word diff (second pass)
+    const merged = [];
+    for (let i = 0; i < blockOps.length; i++) {
+      const op = blockOps[i];
+      const next = blockOps[i + 1];
+      if (op.op === "del" && next && next.op === "ins") {
+        const oldEl = beforeByText.get(op.text) || bQueue.find((e) => (e.innerText || "").trim() === op.text);
+        const newEl = afterByText.get(next.text) || aQueue.find((e) => (e.innerText || "").trim() === next.text);
+        const tag = ((newEl || oldEl)?.tagName || "P").toLowerCase();
+        const cls = (newEl || oldEl)?.className ? ` class="${esc((newEl || oldEl).className)}"` : "";
+        const inline = wordDiffInline(op.text, next.text);
+        merged.push({ html: `<${tag}${cls}>${inline}</${tag}>` });
+        i++;
+      } else if (op.op === "eq") {
+        const el = afterByText.get(op.text);
+        merged.push({ html: el ? el.outerHTML : `<p>${esc(op.text)}</p>` });
+      } else if (op.op === "del") {
+        merged.push({
+          html: `<p><del class="hist-del">${esc(op.text)}</del></p>`,
+        });
+      } else {
+        const el = afterByText.get(op.text);
+        if (el) {
+          merged.push({
+            html: el.outerHTML.replace(
+              /^(<[a-z0-9]+)([^>]*>)([\s\S]*)(<\/[a-z0-9]+>)$/i,
+              (_, a, b, mid, c) => `${a}${b}<ins class="hist-ins">${mid}</ins>${c}`
+            ),
+          });
+        } else {
+          merged.push({ html: `<p><ins class="hist-ins">${esc(op.text)}</ins></p>` });
+        }
+      }
+    }
+
+    return merged.map((m) => m.html).join("\n");
+  };
+
+  /** Fallback when only line hunks exist (seed / old tracks). */
+  const proseFromHunks = (hunks) => {
+    const parts = [];
+    let bufDel = [];
+    let bufIns = [];
+    const flush = () => {
+      if (bufDel.length || bufIns.length) {
+        const oldT = bufDel.join("\n");
+        const newT = bufIns.join("\n");
+        if (oldT && newT) {
+          parts.push(`<p>${wordDiffInline(oldT, newT)}</p>`);
+        } else if (oldT) {
+          parts.push(`<p><del class="hist-del">${esc(oldT)}</del></p>`);
+        } else if (newT) {
+          parts.push(`<p><ins class="hist-ins">${esc(newT)}</ins></p>`);
+        }
+        bufDel = [];
+        bufIns = [];
+      }
+    };
+    (hunks || []).forEach((h) => {
+      if (h.op === "eq") {
+        flush();
+        if ((h.text || "").trim()) parts.push(`<p>${esc(h.text)}</p>`);
+      } else if (h.op === "del") {
+        bufDel.push(h.text);
+      } else if (h.op === "ins") {
+        bufIns.push(h.text);
+      }
+    });
+    flush();
+    return parts.join("\n");
+  };
+
+  const renderTrackProse = (track) => {
+    if (track?.beforeHtml && track?.snapshotHtml) {
+      return proseDiffHtml(track.beforeHtml, track.snapshotHtml);
+    }
+    if (track?.hunks?.length) return proseFromHunks(track.hunks);
+    return track?.snapshotHtml || "";
+  };
 
   const uid = () => {
     const d = new Date();
@@ -1773,7 +1897,6 @@ body.is-editing .article {
 
   const articlePlain = (articleEl) => {
     if (!articleEl) return "";
-    // Stable-ish plaintext for diffing reviews
     return articleEl.innerText.replace(/\u00a0/g, " ").replace(/\r\n/g, "\n").trimEnd() + "\n";
   };
 
@@ -1802,11 +1925,9 @@ body.is-editing .article {
     return local;
   };
 
-  const createTrack = async ({ label, oldText, newText, snapshotHtml, source }) => {
-    const { hunks, stats, empty } = diffIncremental(oldText, newText, 1);
-    if (empty) {
-      return { ok: false, reason: "no-change" };
-    }
+  const createTrack = async ({ label, oldText, newText, snapshotHtml, beforeHtml, source }) => {
+    const { hunks, stats, empty } = diffIncremental(oldText, newText);
+    if (empty) return { ok: false, reason: "no-change" };
     const prev = await idbMetaGet("headId");
     const track = {
       id: uid(),
@@ -1815,22 +1936,18 @@ body.is-editing .article {
       parentId: prev || null,
       source: source || "browser",
       stats,
-      hunks, // incremental only
+      hunks,
+      beforeHtml: beforeHtml || null,
       snapshotHtml: snapshotHtml || null,
     };
     await idbPut(track);
     await idbMetaSet("headId", track.id);
     await idbMetaSet("headPlain", newText);
     await idbMetaSet("headHtml", snapshotHtml || null);
-
     let api = null;
     if (await probeApi()) {
       try {
-        api = await pushApi({
-          track,
-          plain: newText,
-          html: snapshotHtml,
-        });
+        api = await pushApi({ track, plain: newText, html: snapshotHtml, beforeHtml });
       } catch (e) {
         api = { ok: false, error: String(e.message || e) };
       }
@@ -1841,7 +1958,14 @@ body.is-editing .article {
   const ensureSeed = async (seedTrack) => {
     if (!seedTrack?.id) return;
     const all = await idbGetAll();
-    if (all.some((t) => t.id === seedTrack.id)) return;
+    if (all.some((t) => t.id === seedTrack.id)) {
+      // upgrade seed with html if missing
+      const existing = all.find((t) => t.id === seedTrack.id);
+      if (existing && !existing.snapshotHtml && seedTrack.snapshotHtml) {
+        await idbPut({ ...existing, ...seedTrack });
+      }
+      return;
+    }
     await idbPut(seedTrack);
     const head = await idbMetaGet("headId");
     if (!head) {
@@ -1853,7 +1977,10 @@ body.is-editing .article {
   window.VillaHistory = {
     articlePlain,
     diffIncremental,
-    renderHunksHtml,
+    wordDiffInline,
+    proseDiffHtml,
+    proseFromHunks,
+    renderTrackProse,
     listTracks,
     createTrack,
     ensureSeed,
@@ -1864,7 +1991,7 @@ body.is-editing .article {
   };
 })();
 </script>
-<script>/* Review/edit monography with client → Save creates an incremental history track */
+<script>/* Review/edit monography → Save creates an incremental history track */
 (() => {
   if (!document.body.classList.contains("mono-page")) return;
   const H = window.VillaHistory;
@@ -1884,7 +2011,7 @@ body.is-editing .article {
     <button type="button" class="edit-btn" data-edit-action="toggle">Corriger</button>
     <button type="button" class="edit-btn edit-save" data-edit-action="save" hidden>Enregistrer</button>
     <button type="button" class="edit-btn edit-cancel" data-edit-action="cancel" hidden>Annuler</button>
-    <input type="text" class="edit-label" placeholder="Libellé (ex. remarque client §3)" hidden maxlength="120">
+    <input type="text" class="edit-label" placeholder="Libellé" hidden maxlength="120">
     <span class="edit-status" aria-live="polite"></span>
   `;
   navInner.appendChild(bar);
@@ -1912,7 +2039,7 @@ body.is-editing .article {
     labelInput.hidden = !on;
     if (on) {
       article.focus({ preventScroll: true });
-      setStatus("Mode correction — Enregistrer = nouvelle piste d’historique (diff de cet edit seulement).");
+      setStatus("");
     } else {
       setStatus("");
     }
@@ -1928,7 +2055,6 @@ body.is-editing .article {
   btnCancel.addEventListener("click", () => {
     article.innerHTML = htmlBefore;
     setEditing(false);
-    setStatus("Annulé.");
   });
 
   btnSave.addEventListener("click", async () => {
@@ -1936,17 +2062,17 @@ body.is-editing .article {
     const htmlSnap = article.innerHTML;
     const label = labelInput.value.trim() || `Correction ${new Date().toLocaleString("fr-FR")}`;
     btnSave.disabled = true;
-    setStatus("Enregistrement…");
     try {
       const res = await H.createTrack({
         label,
         oldText: snapshotBefore,
         newText: plain,
+        beforeHtml: htmlBefore,
         snapshotHtml: htmlSnap,
         source: "review-ui",
       });
       if (!res.ok) {
-        setStatus("Aucun changement détecté.", false);
+        setStatus("Aucun changement.", false);
         btnSave.disabled = false;
         return;
       }
@@ -1954,29 +2080,19 @@ body.is-editing .article {
       htmlBefore = htmlSnap;
       labelInput.value = "";
       setEditing(false);
-      const apiNote = res.api?.ok
-        ? " · écrit sur disque (_history/tracks)"
-        : res.api?.error
-          ? " · navigateur seulement (lancer _history_api.py pour disque)"
-          : " · navigateur (IndexedDB)";
-      setStatus(
-        `Piste ${res.track.id} · −${res.track.stats.delete} +${res.track.stats.insert}${apiNote}`,
-        true
-      );
-      // Soft ping Histoire tab storage event
+      setStatus("Enregistré.", true);
       try {
         localStorage.setItem("villa-history-ping", String(Date.now()));
       } catch (_) {
         /* ignore */
       }
     } catch (e) {
-      setStatus(`Erreur: ${e.message || e}`, false);
+      setStatus(String(e.message || e), false);
     } finally {
       btnSave.disabled = false;
     }
   });
 
-  // Ctrl/Cmd+S while editing
   document.addEventListener("keydown", (e) => {
     if (!editing) return;
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
