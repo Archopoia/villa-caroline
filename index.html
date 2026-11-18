@@ -2050,6 +2050,33 @@ body.is-editing .article {
     if (plain != null) await H.idbMetaSet("headPlain", plain);
   };
 
+  const downloadHead = (html) => {
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "current-article.html";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  /** Push browser head → `_history/current-article.html` (+ patch indexes). */
+  const pushToDisk = async (html) => {
+    const body = html || article.innerHTML;
+    if (!body) return { ok: false, reason: "empty" };
+    await persistHead(body, H.articlePlain(article));
+    if (await H.probeApi()) {
+      const r = await fetch(`${H.API_BASE}/api/current`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ html: body }),
+      });
+      if (!r.ok) throw new Error(await r.text());
+      return { ok: true, via: "api", ...(await r.json()) };
+    }
+    downloadHead(body);
+    return { ok: true, via: "download" };
+  };
+
   /** Restore last saved monography so tab switches don’t wipe edits. */
   const restoreCurrent = async () => {
     let html = readLsHead() || (await H.idbMetaGet("headHtml"));
@@ -2079,6 +2106,18 @@ body.is-editing .article {
     if (html) {
       applyArticleHtml(html);
       await persistHead(html);
+      // If local API is up, mirror browser → disk so agents can read it
+      if (await H.probeApi()) {
+        try {
+          await fetch(`${H.API_BASE}/api/current`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ html }),
+          });
+        } catch (_) {
+          /* ignore */
+        }
+      }
     }
   };
 
@@ -2088,6 +2127,7 @@ body.is-editing .article {
     <button type="button" class="edit-btn" data-edit-action="toggle">Corriger</button>
     <button type="button" class="edit-btn edit-save" data-edit-action="save" hidden>Enregistrer</button>
     <button type="button" class="edit-btn edit-cancel" data-edit-action="cancel" hidden>Annuler</button>
+    <button type="button" class="edit-btn" data-edit-action="disk" title="Écrire _history/current-article.html (API locale) ou télécharger">Disque</button>
     <input type="text" class="edit-label" placeholder="Libellé" hidden maxlength="120">
     <span class="edit-status" aria-live="polite"></span>
   `;
@@ -2098,6 +2138,7 @@ body.is-editing .article {
   const btnToggle = bar.querySelector('[data-edit-action="toggle"]');
   const btnSave = bar.querySelector('[data-edit-action="save"]');
   const btnCancel = bar.querySelector('[data-edit-action="cancel"]');
+  const btnDisk = bar.querySelector('[data-edit-action="disk"]');
 
   const setStatus = (msg, ok) => {
     status.textContent = msg || "";
@@ -2131,6 +2172,19 @@ body.is-editing .article {
     setEditing(false);
   });
 
+  btnDisk.addEventListener("click", async () => {
+    btnDisk.disabled = true;
+    try {
+      const res = await pushToDisk(article.innerHTML);
+      if (res.via === "api") setStatus("Écrit sur le disque (current-article).", true);
+      else setStatus("Téléchargé — déposer dans _history/current-article.html", true);
+    } catch (e) {
+      setStatus(String(e.message || e), false);
+    } finally {
+      btnDisk.disabled = false;
+    }
+  });
+
   btnSave.addEventListener("click", async () => {
     const plain = H.articlePlain(article);
     const htmlSnap = article.innerHTML;
@@ -2150,13 +2204,19 @@ body.is-editing .article {
         btnSave.disabled = false;
         return;
       }
-      // Persist as the live monography (survives tab changes)
       await persistHead(htmlSnap, plain);
       snapshotBefore = plain;
       htmlBefore = htmlSnap;
       labelInput.value = "";
       setEditing(false);
-      setStatus("Enregistré sur la monographie.", true);
+      const disk = await pushToDisk(htmlSnap).catch(() => null);
+      const diskMsg =
+        disk?.via === "api"
+          ? " + disque"
+          : disk?.via === "download"
+            ? " (export HTML)"
+            : "";
+      setStatus(`Enregistré sur la monographie${diskMsg}.`, true);
       try {
         localStorage.setItem("villa-history-ping", String(Date.now()));
       } catch (_) {
