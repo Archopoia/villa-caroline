@@ -1204,6 +1204,13 @@ body.histoire-page { background: var(--paper, #f6f1e8); }
     await idbMetaSet("headId", track.id);
     await idbMetaSet("headPlain", newText);
     await idbMetaSet("headHtml", snapshotHtml || null);
+    if (snapshotHtml) {
+      try {
+        localStorage.setItem("villa-caroline-head-html", snapshotHtml);
+      } catch (_) {
+        /* quota / private mode */
+      }
+    }
     let api = null;
     if (await probeApi()) {
       try {

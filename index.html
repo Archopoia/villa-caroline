@@ -1947,6 +1947,13 @@ body.is-editing .article {
     await idbMetaSet("headId", track.id);
     await idbMetaSet("headPlain", newText);
     await idbMetaSet("headHtml", snapshotHtml || null);
+    if (snapshotHtml) {
+      try {
+        localStorage.setItem("villa-caroline-head-html", snapshotHtml);
+      } catch (_) {
+        /* quota / private mode */
+      }
+    }
     let api = null;
     if (await probeApi()) {
       try {
@@ -2008,9 +2015,26 @@ body.is-editing .article {
   const navInner = document.querySelector(".site-nav-inner");
   if (!article || !navInner) return;
 
+  const LS_HEAD = "villa-caroline-head-html";
   let editing = false;
   let snapshotBefore = "";
   let htmlBefore = "";
+
+  const readLsHead = () => {
+    try {
+      return localStorage.getItem(LS_HEAD) || null;
+    } catch (_) {
+      return null;
+    }
+  };
+
+  const writeLsHead = (html) => {
+    try {
+      if (html) localStorage.setItem(LS_HEAD, html);
+    } catch (_) {
+      /* quota / private mode */
+    }
+  };
 
   const applyArticleHtml = (html) => {
     if (!html) return false;
@@ -2019,22 +2043,43 @@ body.is-editing .article {
     return true;
   };
 
+  const persistHead = async (html, plain) => {
+    if (!html) return;
+    writeLsHead(html);
+    await H.idbMetaSet("headHtml", html);
+    if (plain != null) await H.idbMetaSet("headPlain", plain);
+  };
+
   /** Restore last saved monography so tab switches don’t wipe edits. */
   const restoreCurrent = async () => {
-    let html = await H.idbMetaGet("headHtml");
+    let html = readLsHead() || (await H.idbMetaGet("headHtml"));
+    if (!html) {
+      try {
+        const headId = await H.idbMetaGet("headId");
+        const tracks = await H.listTracks();
+        const hit =
+          (headId && tracks.find((t) => t.id === headId && t.snapshotHtml)) ||
+          [...tracks].reverse().find((t) => t.snapshotHtml);
+        html = hit?.snapshotHtml || null;
+      } catch (_) {
+        /* ignore */
+      }
+    }
     if (!html && (await H.probeApi())) {
       try {
         const r = await fetch(`${H.API_BASE}/api/current`);
         if (r.ok) {
           const data = await r.json();
           html = data.html || null;
-          if (html) await H.idbMetaSet("headHtml", html);
         }
       } catch (_) {
         /* ignore */
       }
     }
-    if (html) applyArticleHtml(html);
+    if (html) {
+      applyArticleHtml(html);
+      await persistHead(html);
+    }
   };
 
   const bar = document.createElement("div");
@@ -2106,8 +2151,7 @@ body.is-editing .article {
         return;
       }
       // Persist as the live monography (survives tab changes)
-      await H.idbMetaSet("headHtml", htmlSnap);
-      await H.idbMetaSet("headPlain", plain);
+      await persistHead(htmlSnap, plain);
       snapshotBefore = plain;
       htmlBefore = htmlSnap;
       labelInput.value = "";
@@ -2134,6 +2178,9 @@ body.is-editing .article {
     if (e.key === "Escape") btnCancel.click();
   });
 
+  // Sync warm restore (no flash of canon HTML), then reconcile IDB/API.
+  const warm = readLsHead();
+  if (warm) applyArticleHtml(warm);
   restoreCurrent();
 })();
 </script>
