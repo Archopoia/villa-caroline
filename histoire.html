@@ -831,16 +831,21 @@ body.histoire-page { background: var(--paper, #f6f1e8); }
   -webkit-box-decoration-break: clone;
 }
 .histoire-page .article .hist-sent-del {
-  background: rgba(180, 50, 50, 0.16);
+  background: rgba(180, 50, 50, 0.14);
   color: inherit;
-  text-decoration: none;
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+.histoire-page .article .hist-sent-removed {
+  display: inline;
+  opacity: 0.85;
 }
 .histoire-page .article .hist-sent-ins {
   background: rgba(40, 130, 70, 0.18);
   color: inherit;
 }
 .histoire-page .article .hist-sent-same {
-  background: rgba(120, 120, 80, 0.08);
+  background: rgba(120, 120, 80, 0.07);
 }
 .visually-hidden {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -980,42 +985,44 @@ body.histoire-page { background: var(--paper, #f6f1e8); }
     return parts.map((p) => p.trim()).filter(Boolean);
   };
 
-  /** Soft sentence wash inside one paragraph (no word chopping). */
+  /**
+   * One paragraph only (the new text). Unchanged sentences: light tint.
+   * New/changed sentences: stronger green. Dropped sentences: one compact red line above.
+   */
   const sentenceDiffHtml = (oldText, newText) => {
     const a = splitSentences(oldText);
     const b = splitSentences(newText);
-    if (!a.length && !b.length) return "";
-    if (!a.length) {
-      return `<span class="hist-sent hist-sent-ins">${esc(newText)}</span>`;
-    }
     if (!b.length) {
       return `<span class="hist-sent hist-sent-del">${esc(oldText)}</span>`;
     }
-    // If almost the whole para changed as one unit, one wash each
-    if (a.length <= 1 && b.length <= 1) {
-      return (
-        `<span class="hist-sent hist-sent-del">${esc(oldText)}</span>` +
-        `<span class="hist-sent hist-sent-ins">${esc(newText)}</span>`
-      );
+    if (!a.length) {
+      return `<span class="hist-sent hist-sent-ins">${esc(newText)}</span>`;
     }
     const ops = lcsOps(a, b);
-    const out = [];
+    const removed = [];
+    const body = [];
     for (let i = 0; i < ops.length; i++) {
       const op = ops[i];
       const next = ops[i + 1];
       if (op.op === "eq") {
-        out.push(`<span class="hist-sent hist-sent-same">${esc(op.text)}</span> `);
+        body.push(`<span class="hist-sent hist-sent-same">${esc(op.text)}</span> `);
       } else if (op.op === "del" && next && next.op === "ins") {
-        out.push(`<span class="hist-sent hist-sent-del">${esc(op.text)}</span> `);
-        out.push(`<span class="hist-sent hist-sent-ins">${esc(next.text)}</span> `);
+        // Replaced sentence → show only the new one (green), skip duplicating old
+        body.push(`<span class="hist-sent hist-sent-ins">${esc(next.text)}</span> `);
         i++;
       } else if (op.op === "del") {
-        out.push(`<span class="hist-sent hist-sent-del">${esc(op.text)}</span> `);
+        removed.push(op.text);
       } else {
-        out.push(`<span class="hist-sent hist-sent-ins">${esc(op.text)}</span> `);
+        body.push(`<span class="hist-sent hist-sent-ins">${esc(op.text)}</span> `);
       }
     }
-    return out.join("").trim();
+    let html = body.join("").trim();
+    if (removed.length) {
+      html =
+        `<span class="hist-sent hist-sent-del hist-sent-removed">${esc(removed.join(" "))}</span> ` +
+        html;
+    }
+    return html;
   };
 
   const wrapBlock = (el, kind, innerHtml) => {
@@ -1059,20 +1066,20 @@ body.histoire-page { background: var(--paper, #f6f1e8); }
         const newEl = after[next.bi];
         const oldT = oldEl?.innerText || op.text;
         const newT = newEl?.innerText || next.text;
-        // Media / tables / headings: show both as full soft blocks (keep markup)
-        const isRich =
-          newEl &&
-          /^(H[1-6]|TABLE|UL|OL|DIV|FIGURE|DETAILS)$/i.test(newEl.tagName);
-        if (isRich || /figure-wrap|compare|tag-legend|source-line/i.test(newEl?.className || "")) {
-          out.push(wrapBlock(oldEl, "del", oldEl.innerHTML));
+        const tag = (newEl?.tagName || "P").toUpperCase();
+        const rich =
+          /^(H[1-6]|TABLE|UL|OL|DIV|FIGURE|DETAILS|SECTION)$/.test(tag) ||
+          /figure-wrap|compare|tag-legend|mobile-explore/i.test(newEl?.className || "");
+        // One copy only: the current (after) block, softly marked.
+        // Short prose can get sentence-level tint; tables/media = whole-block green wash.
+        if (rich || newT.length > 400) {
           out.push(wrapBlock(newEl, "ins", newEl.innerHTML));
         } else {
-          // One flowing paragraph: previous sentence(s) soft-red, new soft-green
-          const inner = sentenceDiffHtml(oldT, newT);
-          out.push(wrapBlock(newEl || oldEl, "changed", inner));
+          out.push(wrapBlock(newEl, "changed", sentenceDiffHtml(oldT, newT)));
         }
         i++;
       } else if (op.op === "del") {
+        // Removed with no replacement — show once, compact
         const el = before[op.ai];
         out.push(wrapBlock(el, "del", el.innerHTML));
       } else if (op.op === "ins") {
