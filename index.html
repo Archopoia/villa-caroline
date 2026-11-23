@@ -2109,7 +2109,10 @@ body.is-editing .article {
   if (!article || !navInner) return;
 
   // bump when shipped article chrome/widgets change (avoids stale IDB wiping fixes)
-  const LS_HEAD = "villa-caroline-head-html-v4";
+  const HEAD_VER = "v4";
+  const LS_HEAD = `villa-caroline-head-html-${HEAD_VER}`;
+  const IDB_HEAD = `headHtml-${HEAD_VER}`;
+  const IDB_PLAIN = `headPlain-${HEAD_VER}`;
   let editing = false;
   let snapshotBefore = "";
   let htmlBefore = "";
@@ -2146,8 +2149,8 @@ body.is-editing .article {
     if (!html) return;
     const clean = scrubRuntimeAttrs(html);
     writeLsHead(clean);
-    await H.idbMetaSet("headHtml", clean);
-    if (plain != null) await H.idbMetaSet("headPlain", plain);
+    await H.idbMetaSet(IDB_HEAD, clean);
+    if (plain != null) await H.idbMetaSet(IDB_PLAIN, plain);
   };
 
   /** Browser head → `_history/current-article.html` + patched indexes (API), else download. */
@@ -2167,19 +2170,9 @@ body.is-editing .article {
 
   /** Restore last saved monography so tab switches don’t wipe edits. */
   const restoreCurrent = async () => {
-    let html = readLsHead() || (await H.idbMetaGet("headHtml"));
-    if (!html) {
-      try {
-        const headId = await H.idbMetaGet("headId");
-        const tracks = await H.listTracks();
-        const hit =
-          (headId && tracks.find((t) => t.id === headId && t.snapshotHtml)) ||
-          [...tracks].reverse().find((t) => t.snapshotHtml);
-        html = hit?.snapshotHtml || null;
-      } catch (_) {
-        /* ignore */
-      }
-    }
+    // Prefer versioned head only — do not fall back to pre-v4 IDB/tracks
+    // (those snapshots can drop widget markup / leave compare unbound).
+    let html = readLsHead() || (await H.idbMetaGet(IDB_HEAD));
     if (!html && (await H.probeApi())) {
       try {
         const r = await fetch(`${H.API_BASE}/api/current`);
