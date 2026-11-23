@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Villa Caroline — Recherche</title>
+<meta name="description" content="Contrôles d’archives, pistes écartées et pièces encore à ouvrir — Villa Caroline, Les Ormes.">
+<meta name="theme-color" content="#2f4a3c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>:root {
+  --ink: #1c2420;
+  --muted: #5a6560;
+  --paper: #f4f2ee;
+  --panel: #ffffff;
+  --line: #d4d8d3;
+  --accent: #2f4a3c;
+  --accent-soft: rgba(47, 74, 60, 0.12);
+  --link: #1a4f6e;
+  --f: #1f6b45;
+  --s: #9a6b12;
+  --h: #2a5a8a;
+  --av: #6b6f6c;
+  --measure: 46rem;
+  --rail: 12.5rem;
+  --flash: #d8e8c8;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 3.5rem; }
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 500px at 10% -10%, #e7ebe4 0%, transparent 55%),
+    var(--paper);
+  font-family: "Source Serif 4", "Libre Baskerville", Georgia, "Times New Roman", serif;
+  font-size: 1.125rem;
+  line-height: 1.68;
+}
+a {
+  color: var(--link);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  transition: color .15s ease, background-color .15s ease;
+}
+a:hover { color: var(--accent); }
+
+/* Site nav (Monographie | Archives) */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 80;
+  background: rgba(244, 242, 238, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.site-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: min(100% - 1.5rem, 90rem);
+  margin: 0 auto;
+  padding: .65rem 0;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+}
+.site-brand {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+.site-tabs { display: flex; gap: .25rem; }
+.site-tabs a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: .88rem;
+  font-weight: 600;
+  padding: .45rem .75rem;
+  border: 1px solid transparent;
+}
+.site-tabs a:hover { color: var(--ink); }
+.site-tabs a.is-active {
+  color: var(--accent);
+  border-color: var(--line);
+  background: var(--panel);
+}
+
+/* Progress */
+.progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  z-index: 100;
+  background: transparent;
+  pointer-events: none;
+}
+.progress > span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent), #6a8f72);
+  transition: width .05s linear;
+}
+
+/* Hero */
+.hero {
+  position: relative;
+  width: 100%;
+  min-height: min(68vh, 560px);
+  background: #2a3330 center/cover no-repeat;
+  display: flex;
+  align-items: flex-end;
+  isolation: isolate;
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(12,18,16,.82) 0%, rgba(12,18,16,.28) 48%, rgba(12,18,16,.18) 100%);
+}
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  width: min(100% - 2rem, 74rem);
+  margin: 0 auto;
+  padding: 3rem 0 2.4rem;
+  color: #f4f2ee;
+}
+.hero h1 {
+  margin: 0 0 .4rem;
+  font-size: clamp(2.3rem, 5.2vw, 3.55rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  animation: rise .7s ease both;
+}
+.hero .subtitle {
+  margin: 0 0 1.25rem;
+  max-width: 36rem;
+  font-size: 1.05rem;
+  opacity: .92;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  animation: rise .7s .08s ease both;
+}
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: .92rem;
+  font-weight: 600;
+  color: #f4f2ee;
+  text-decoration: none;
+  border: 1px solid rgba(244,242,238,.45);
+  padding: .55rem 1rem;
+  transition: background .2s ease, border-color .2s ease, transform .2s ease;
+  animation: rise .7s .16s ease both;
+}
+.hero-cta:hover {
+  background: rgba(244,242,238,.12);
+  border-color: rgba(244,242,238,.85);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.hero-cta::after { content: "↓"; opacity: .8; }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Layout */
+.layout {
+  display: grid;
+  grid-template-columns: var(--rail) minmax(0, 1fr) var(--rail);
+  column-gap: clamp(1.75rem, 3.5vw, 3.25rem);
+  row-gap: 1.5rem;
+  width: min(100% - 2.5rem, 90rem);
+  margin: 0 auto;
+  padding: 2rem 0 5rem;
+  align-items: start;
+}
+.toc, .explore {
+  position: sticky;
+  top: 1.4rem;
+  align-self: start;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: .8rem;
+  line-height: 1.35;
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+}
+.rail-label {
+  display: block;
+  margin: 0 0 .55rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  font-size: .7rem;
+  font-weight: 700;
+}
+.toc a {
+  display: block;
+  color: var(--muted);
+  text-decoration: none;
+  padding: .32rem 0 .32rem .7rem;
+  border-left: 2px solid transparent;
+  margin-left: -.7rem;
+  transition: color .15s ease, border-color .15s ease, background .15s ease;
+}
+.toc a:hover { color: var(--ink); border-left-color: #a7b7ab; }
+.toc a.is-active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* Explore rail */
+.explore-block { margin-bottom: 1.35rem; }
+.chip-row { display: flex; flex-wrap: wrap; gap: .35rem; }
+.chip {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  font-size: .74rem;
+  font-weight: 600;
+  padding: .28rem .55rem;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, color .15s ease, transform .15s ease;
+}
+.chip:hover { border-color: var(--accent); transform: translateY(-1px); }
+.chip.is-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #f7f6f3;
+}
+.chip.tag-f.is-on, .chip[data-filter="f"].is-on { background: var(--f); border-color: var(--f); }
+.chip.tag-s.is-on, .chip[data-filter="s"].is-on { background: var(--s); border-color: var(--s); }
+.chip.tag-h.is-on, .chip[data-filter="h"].is-on { background: var(--h); border-color: var(--h); }
+.chip.tag-av.is-on, .chip[data-filter="av"].is-on { background: var(--av); border-color: var(--av); }
+.explore-hint {
+  margin: .55rem 0 0;
+  color: var(--muted);
+  font-size: .72rem;
+  line-height: 1.35;
+}
+.quick-links { display: grid; gap: .25rem; }
+.quick-links a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: .2rem 0;
+}
+.quick-links a:hover { color: var(--link); }
+
+/* Article */
+.article {
+  min-width: 0;
+  max-width: var(--measure);
+  width: 100%;
+  justify-self: center;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+.article > *:first-child { margin-top: 0; }
+.article h2, .article h3, .article .tag-legend, .article table,
+.article .tag-legend p, .article figcaption, .article p > em:only-child,
+.article .figure-wrap, .article .compare, .article .source-line { text-align: left; }
+h2 {
+  margin: 2.5rem 0 .95rem;
+  font-size: 1.55rem;
+  line-height: 1.25;
+  color: var(--accent);
+  font-weight: 600;
+  scroll-margin-top: 3.5rem;
+}
+h3 {
+  margin: 1.7rem 0 .55rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  scroll-margin-top: 3.5rem;
+}
+h2.is-flash, h3.is-flash, .xref-hit.is-flash {
+  animation: flash 1.2s ease;
+}
+@keyframes flash {
+  0%, 100% { background: transparent; }
+  25% { background: var(--flash); }
+}
+p { margin: 0 0 1rem; }
+blockquote {
+  margin: 1rem 0;
+  padding: .25rem 0 .25rem 1rem;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+  font-style: italic;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .95rem;
+  margin: 1rem 0 1.4rem;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+}
+th, td {
+  border-bottom: 1px solid var(--line);
+  padding: .45rem .4rem;
+  text-align: left;
+  vertical-align: top;
+}
+tr:hover td { background: rgba(47,74,60,.04); }
+
+/* Figures + lightbox */
+.figure-wrap {
+  margin: 1.15rem 0 .2rem;
+  position: relative;
+}
+.figure-wrap img,
+.article > p > img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0;
+  cursor: zoom-in;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.figure-wrap:hover img,
+.article > p > img:hover {
+  transform: scale(1.01);
+  box-shadow: 0 10px 28px rgba(28,36,32,.12);
+}
+.figure-wrap .zoom-hint {
+  position: absolute;
+  right: .55rem;
+  bottom: .55rem;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: .68rem;
+  font-weight: 600;
+  color: #f4f2ee;
+  background: rgba(12,18,16,.55);
+  padding: .2rem .4rem;
+  opacity: 0;
+  transition: opacity .2s ease;
+  pointer-events: none;
+}
+.figure-wrap:hover .zoom-hint { opacity: 1; }
+.article p:has(> img) { margin-bottom: .2rem; }
+/* Captions only: a paragraph that is entirely <em>…</em> (figure legends).
+   Inline emphasis like *cette* must stay in the body flow. */
+.article p > em:only-child {
+  display: block;
+  font-size: .9rem;
+  color: var(--muted);
+  margin: 0 0 1.25rem;
+  line-height: 1.45;
+}
+
+/* Compare slider */
+.compare {
+  position: relative;
+  margin: 1.2rem 0 1.5rem;
+  overflow: hidden;
+  background: #1c2420;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  cursor: ew-resize;
+  aspect-ratio: 16 / 10;
+}
+.compare:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.compare img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  margin: 0;
+  max-width: none;
+  pointer-events: none;
+  cursor: inherit;
+  transform: none !important;
+  box-shadow: none !important;
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+.compare .compare-top {
+  clip-path: inset(0 50% 0 0);
+  -webkit-clip-path: inset(0 50% 0 0);
+}
+.compare-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  background: #f4f2ee;
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: none;
+}
+.compare-handle::before {
+  content: "⟷";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 999px;
+  background: #f4f2ee;
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+  font-size: .9rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,.25);
+  pointer-events: none;
+}
+.compare-label {
+  position: absolute;
+  top: .6rem;
+  z-index: 2;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #f4f2ee;
+  background: rgba(12,18,16,.5);
+  padding: .2rem .45rem;
+  pointer-events: none;
+}
+.compare-label.before { left: .6rem; }
+.compare-label.after { right: .6rem; }
+.compare-caption {
+  margin: .35rem 0 1.4rem;
+  font-size: .9rem;
+  color: var(--muted);
+  font-style: italic;
+  font-family: "Source Serif 4", Georgia, serif;
+}
+
+/* Tags */
+.tag {
+  display: inline-block;
+  position: relative;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: .72rem;
+  font-weight: 700;
+  font-style: normal;
+  letter-spacing: .02em;
+  padding: .08em .38em;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  vertical-align: .12em;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: help;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+.tag:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 0 currentColor;
+  background: rgba(255,255,255,.65);
+}
+.tag-f { color: var(--f); }
+.tag-s { color: var(--s); }
+.tag-h { color: var(--h); }
+.tag-av { color: var(--av); }
+.tag[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + .35rem);
+  transform: translateX(-50%) translateY(4px);
+  min-width: 11rem;
+  max-width: 16rem;
+  padding: .4rem .5rem;
+  background: #1c2420;
+  color: #f4f2ee;
+  font-size: .68rem;
+  font-weight: 500;
+  line-height: 1.35;
+  white-space: normal;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .15s ease, transform .15s ease;
+  z-index: 20;
+}
+.tag[data-tip]:hover::after,
+.tag[data-tip]:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+body.is-filtering .article > *.is-proof-dim,
+body.is-filtering .toc a.is-proof-dim {
+  opacity: 0.28;
+  transition: opacity 0.2s ease;
+}
+body.is-filtering .article > *:not(.is-proof-dim),
+body.is-filtering .toc a:not(.is-proof-dim) {
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+body.is-filtering .tag:not(.is-proof-match) {
+  opacity: 0.35;
+}
+body.is-filtering .tag.is-proof-match {
+  opacity: 1;
+}
+.tag-legend {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 1rem 1.1rem;
+  margin: 1.5rem 0 2rem;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: .92rem;
+}
+.tag-legend table { margin-bottom: 0; }
+
+/* Source lines + xrefs */
+.source-line {
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: .92rem;
+  padding: .35rem .55rem;
+  margin: -.35rem 0 1rem;
+  border-left: 2px solid transparent;
+  transition: background .15s ease, border-color .15s ease;
+}
+.source-line:hover {
+  background: rgba(26,79,110,.06);
+  border-left-color: var(--link);
+}
+.source-line a { word-break: break-word; }
+.xref {
+  appearance: none;
+  border: 0;
+  background: linear-gradient(transparent 60%, rgba(47,74,60,.18) 60%);
+  color: inherit;
+  font: inherit;
+  padding: 0 .05em;
+  cursor: pointer;
+  border-radius: 1px;
+  transition: background .15s ease;
+}
+.xref:hover {
+  background: linear-gradient(transparent 55%, rgba(47,74,60,.32) 55%);
+  color: var(--accent);
+}
+body.xref-salis .xref[data-xref="salis"],
+body.xref-deglane .xref[data-xref="deglane"],
+body.xref-marie-louise .xref[data-xref="marie-louise"],
+body.xref-audy .xref[data-xref="audy"],
+body.xref-naintre .xref[data-xref="naintre"],
+body.xref-parcelle .xref[data-xref="parcelle"] {
+  background: var(--flash);
+}
+
+/* Lightbox */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(12,18,16,.88);
+  backdrop-filter: blur(4px);
+}
+.lightbox.is-open { display: flex; }
+.lightbox img {
+  max-width: min(1100px, 94vw);
+  max-height: 86vh;
+  object-fit: contain;
+  box-shadow: 0 20px 60px rgba(0,0,0,.4);
+  animation: rise .25s ease;
+}
+.lightbox-cap {
+  position: absolute;
+  left: 50%;
+  bottom: 1.1rem;
+  transform: translateX(-50%);
+  max-width: min(48rem, 90vw);
+  color: #e8ebe6;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: .85rem;
+  text-align: center;
+  opacity: .9;
+}
+.lightbox-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  appearance: none;
+  border: 1px solid rgba(244,242,238,.35);
+  background: transparent;
+  color: #f4f2ee;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: .85rem;
+  padding: .4rem .7rem;
+  cursor: pointer;
+}
+.lightbox-close:hover { background: rgba(244,242,238,.12); }
+
+.back-top {
+  position: fixed;
+  right: 1.1rem;
+  bottom: 1.1rem;
+  z-index: 50;
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: .78rem;
+  font-weight: 600;
+  padding: .55rem .7rem;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease;
+}
+.back-top.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.back-top:hover { transform: translateY(-2px); border-color: var(--accent); }
+
+.mobile-explore { display: none; }
+
+@media (max-width: 1200px) {
+  .layout {
+    grid-template-columns: 11.5rem minmax(0, 1fr);
+    width: min(100% - 2rem, 78rem);
+  }
+  .explore { display: none; }
+  .mobile-explore {
+    display: block;
+    margin: 0 0 1.35rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .mobile-explore .rail-label { margin-top: .75rem; }
+  .mobile-explore .rail-label:first-child { margin-top: 0; }
+  .mobile-explore .chip-row { margin-top: .35rem; }
+}
+
+@media (max-width: 900px) {
+  html { scroll-padding-top: 1rem; }
+  body {
+    font-size: 1.05rem;
+    line-height: 1.62;
+  }
+  .hero {
+    min-height: min(52vh, 380px);
+    background-position: center 30%;
+  }
+  .hero-inner {
+    width: min(100% - 1.25rem, 46rem);
+    padding: 1.75rem 0 1.5rem;
+  }
+  .hero h1 { font-size: clamp(1.85rem, 8vw, 2.4rem); }
+  .hero .subtitle { font-size: .95rem; margin-bottom: 1rem; }
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    width: min(100% - 1.25rem, 46rem);
+    padding: 1.25rem 0 4.5rem;
+  }
+  .article {
+    justify-self: stretch;
+    max-width: none;
+    text-align: left; /* avoid justify rivers on narrow screens */
+  }
+  .toc {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    width: 100%;
+  }
+  .toc-box {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    padding: .15rem .7rem .55rem;
+  }
+  .toc-box > summary {
+    list-style: none;
+    cursor: pointer;
+    font-family: "Source Sans 3", "Segoe UI", sans-serif;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: .55rem 0;
+  }
+  .toc-box > summary::-webkit-details-marker { display: none; }
+  .toc-box > summary::after {
+    content: " +";
+    float: right;
+    font-weight: 700;
+  }
+  .toc-box[open] > summary::after { content: " −"; }
+  .toc-box .rail-label { display: none; }
+  .toc-box .toc-links {
+    display: grid;
+    gap: .1rem;
+    padding-bottom: .35rem;
+  }
+  .toc a {
+    border: 0;
+    margin: 0;
+    padding: .45rem 0;
+    font-size: .88rem;
+    line-height: 1.3;
+  }
+  .toc a.is-active {
+    background: transparent;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .chip {
+    min-height: 2.5rem;
+    padding: .4rem .7rem;
+    font-size: .8rem;
+  }
+  .tag[data-tip]::after { display: none; } /* tooltips flaky on touch */
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: .88rem;
+  }
+  .compare { aspect-ratio: 4 / 3; min-height: 12rem; }
+  .compare-handle::before {
+    width: 2.6rem;
+    height: 2.6rem;
+  }
+  .lightbox {
+    padding: .75rem;
+    padding-top: max(.75rem, env(safe-area-inset-top));
+  }
+  .lightbox img {
+    max-width: 100%;
+    max-height: 78vh;
+  }
+  .lightbox-close {
+    top: max(.65rem, env(safe-area-inset-top));
+    right: .65rem;
+    min-height: 2.6rem;
+    min-width: 4.2rem;
+    padding: .55rem .8rem;
+  }
+  .lightbox-cap {
+    bottom: max(.75rem, env(safe-area-inset-bottom));
+    font-size: .78rem;
+  }
+  .back-top {
+    right: max(.75rem, env(safe-area-inset-right));
+    bottom: max(.75rem, env(safe-area-inset-bottom));
+    min-height: 2.6rem;
+    min-width: 2.6rem;
+  }
+  .source-line { font-size: .88rem; word-break: break-word; }
+  h2 { font-size: 1.35rem; margin-top: 2rem; }
+  h3 { font-size: 1.08rem; }
+}
+
+@media (min-width: 901px) {
+  .toc-box {
+    border: 0;
+    background: transparent;
+    padding: 0;
+  }
+  .toc-box > summary { display: none; }
+  .toc-box .toc-links { display: block; }
+}
+@media print {
+  .site-nav, .progress, .toc, .explore, .mobile-explore, .hero-cta, .back-top, .lightbox, .zoom-hint { display: none !important; }
+  body { background: #fff; font-size: 10.5pt; }
+  .hero { min-height: 180px; }
+  .layout { display: block; width: auto; margin: 0; padding: 0 12mm; }
+  a { color: inherit; text-decoration: none; }
+  .compare { break-inside: avoid; }
+}
+</style>
+</head>
+<body class="mono-page">
+
+<header class="site-nav" role="navigation" aria-label="Sections du site">
+  <div class="site-nav-inner">
+    <a class="site-brand" href="index.html">Villa Caroline</a>
+    <nav class="site-tabs">
+      <a href="index.html">Monographie</a>
+      <a href="archives.html">Archives</a>
+      <a href="recherche.html" class="is-active">Recherche</a>
+      <a href="histoire.html">Histoire</a>
+    </nav>
+  </div>
+</header>
+
+<div class="progress" aria-hidden="true"><span></span></div>
+<header class="hero" style="min-height:38vh">
+  <div class="hero-inner">
+    <h1>Recherche</h1>
+    <p class="subtitle">Contrôles, pistes écartées, pièces encore à ouvrir<br>
+    Complément de la <a href="index.html" style="color:inherit;text-decoration:underline">monographie</a></p>
+  </div>
+</header>
+<div class="layout">
+  <nav class="toc" aria-label="Sommaire">
+    <details class="toc-box" open>
+      <summary>Sommaire</summary>
+      <span class="rail-label">Sommaire</span>
+      <div class="toc-links">
+      <a href="#salis-aux-ormes">Salis aux Ormes</a>
+<a href="#mariage-1898">Mariage 1898</a>
+<a href="#recensements-1901-et-1906">Recensements 1901 et 1906</a>
+<a href="#plans-deglane">Plans Deglane</a>
+<a href="#notaire-lasserré">Notaire Lasserré</a>
+<a href="#tang-haywen-géographie">Tang Haywen / géographie</a>
+<a href="#encore-ouvert-salle">Encore ouvert (salle)</a>
+      </div>
+    </details>
+  </nav>
+  <main class="article" id="contenu">
+<h1>Recherche — contrôles et pistes</h1>
+<p><em>Complément à la <a href="index.html">monographie</a>. Ici : ce qui a été lu, ce qui a été écarté, et ce qui reste à ouvrir en salle. Même légende de tags <strong><span class="tag tag-f">[F]</span> / <span class="tag tag-s">[S]</span> / <span class="tag tag-h">[H]</span> / <span class="tag tag-av">[ÀV]</span></strong>.</em></p>
+<hr />
+<h2 id="salis-aux-ormes">Salis aux Ormes</h2>
+<h3 id="tables-décennales">Tables décennales</h3>
+<p>Dans les tables décennales des Ormes pour <strong>1883–1892</strong> et <strong>1893–1902</strong>, le nom <strong><button type="button" class="xref" data-xref="salis">Salis</button></strong> n’apparaît ni aux naissances, ni aux mariages, ni aux décès <span class="tag tag-f"><span class="tag tag-f">[F]</span></span>.</p>
+<p class="source-line">→ <a href="https://archives-deux-sevres-vienne.fr/ark:/28387/vtaf212deb2cbb96a4b">TD Ormes 1883–1892</a><br />
+→ <a href="https://archives-deux-sevres-vienne.fr/ark:/28387/vtae58beb875beb936c">TD Ormes 1893–1902</a></p>
+<p>Sous la lettre S des naissances 1883–1892 figure <strong>Salsier Louis</strong>, 1er avril 1891 — un autre patronyme <span class="tag tag-f"><span class="tag tag-f">[F]</span></span>.</p>
+<div class="figure-wrap"><img alt="Table décennale - Salsier Louis, 1er avril 1891" src="assets/TD_1883-92_Salsier_Louis_naissance_3245b4b7.jpg" /><span class="zoom-hint">Agrandir</span></div>
+<p><em>Extrait TD naissances, lettre S <span class="tag tag-f"><span class="tag tag-f">[F]</span></span>. Source : <a href="https://archives-deux-sevres-vienne.fr/ark:/28387/vtaf212deb2cbb96a4b">AD86, tables 1883-1892</a>. Prouve un Salsier ; ne prouve pas un <button type="button" class="xref" data-xref="salis">Salis</button> propriétaire de la villa.</em></p>
+<p>Même décennie 1893–1902, lettre S : toujours aucun <button type="button" class="xref" data-xref="salis">Salis</button> <span class="tag tag-f"><span class="tag tag-f">[F]</span></span> - <a href="../08_Iconographie/Archives_AD86_EC/TD_1893-1902_naissances_S.jpg">extrait</a>.</p>
+<h3 id="recensement-1891">Recensement 1891</h3>
+<p>Sur les <em>vues consultées</em> (Place de la Halle, Grande Rue) : <strong><button type="button" class="xref" data-xref="salis">Salis</button> non repéré</strong> <span class="tag tag-f"><span class="tag tag-f">[F]</span></span>. À la Place de la Halle : <strong>René d’Argenson</strong>, propriétaire, avec deux enfants et du personnel <span class="tag tag-f"><span class="tag tag-f">[F]</span></span>.</p>
+<p class="source-line">→ <a href="https://archives-deux-sevres-vienne.fr/ark:/28387/vta16b47523a5bb815d">REC 1891</a></p>
+<div class="figure-wrap"><img alt="Recensement 1891 - René d’Argenson, Place de la Halle" src="assets/REC_1891_Rene_dArgenson_Place_Halle_15f542e0.jpg" /><span class="zoom-hint">Agrandir</span></div>
+<p><em>Liste nominative 1891, « La Halle » <span class="tag tag-f"><span class="tag tag-f">[F]</span></span>. Source : <a href="https://archives-deux-sevres-vienne.fr/ark:/28387/vta16b47523a5bb815d">AD86</a>. <button type="button" class="xref" data-xref="salis">Salis</button> non vu sur <em>ces</em> vues.</em></p>
+<h3 id="inventaire-1897-et-silences">Inventaire 1897 et silences</h3>
+<p>La <strong>notice</strong> de l’inventaire après décès ne mentionne pas la commune des Ormes <span class="tag tag-f"><span class="tag tag-f">[F]</span></span> — silence de <em>notice</em>, pas conclusion sur le contenu des feuillets. Le dossier complet n’a pas été lu : présence éventuelle de la villa encore <span class="tag tag-h"><span class="tag tag-h">[H]/[ÀV]</span></span>.</p>
+<p class="source-line">→ <a href="https://francearchives.gouv.fr/fr/facomponent/5c6be812e8374f0f70ae78d3b5c3288fb48117a9">FranceArchives</a></p>
+<p>Des publications sur <button type="button" class="xref" data-xref="salis">Salis</button> et <button type="button" class="xref" data-xref="naintre">Naintré</button> (Oberthür, latourdenaintre.fr, bilan Gallica local) ne parlent pas de la villa des Ormes <span class="tag tag-f"><span class="tag tag-f">[F]</span></span> — absence dans <em>ces</em> textes seulement, pas preuve d’inexistence.</p>
+<p class="source-line">→ <a href="http://academie-de-touraine.com/Tome_22_files/138_243-275.pdf">Académie de Touraine - Oberthür (PDF)</a><br />
+→ <a href="https://latourdenaintre.fr/le-chateau/rodolphe-salis/">latourdenaintre.fr - Salis</a></p>
+<hr />
+<h2 id="mariage-1898">Mariage 1898</h2>
+<p>Le 16 avril 1898, aux Ormes (cote 9 E 217 12 2), acte n° 2 : <strong>Antzlinger Eugène</strong>, armurier, 24 ans, né à Châtellerault, épouse <strong>Coutard Camille Angèle</strong>, couturière, 21 ans, née à Châtellerault, <strong>domiciliée aux Ormes</strong> <span class="tag tag-f"><span class="tag tag-f">[F]</span></span>. Ce n’est pas un <button type="button" class="xref" data-xref="audy">Audy</button> ; l’acte ne porte pas la villa <span class="tag tag-f"><span class="tag tag-f">[F]</span></span>.</p>
+<p class="source-line">→ <a href="https://archives-deux-sevres-vienne.fr/ark:/28387/vta11bbf072540a9c46/daogrp/0/78">AD86 — registre 1896–1899, vue 78</a></p>
+<div class="figure-wrap"><img alt="Acte n° 2, Antzlinger × Coutard, 16 avril 1898" src="assets/v78_R_fd746a5f.jpg" /><span class="zoom-hint">Agrandir</span></div>
+<p><em>Ouverture de l’acte <span class="tag tag-f"><span class="tag tag-f">[F]</span></span>. Source : <a href="https://archives-deux-sevres-vienne.fr/ark:/28387/vta11bbf072540a9c46/daogrp/0/78">vue 78</a>.</em></p>
+<div class="figure-wrap"><img alt="Prononcé, Antzlinger × Coutard" src="assets/v79_L_8924be58.jpg" /><span class="zoom-hint">Agrandir</span></div>
+<p><em>Fin de l’acte n° 2 <span class="tag tag-f"><span class="tag tag-f">[F]</span></span>. Source : <a href="https://archives-deux-sevres-vienne.fr/ark:/28387/vta11bbf072540a9c46/daogrp/0/79">vue 79</a>.</em></p>
+<p>La table décennale <strong>1893-1902</strong> confirme la date et l’épouse <strong>Coutard Camille Angèle</strong> <span class="tag tag-f"><span class="tag tag-f">[F]</span></span>. Les lectures « <button type="button" class="xref" data-xref="audy">Audy</button> Ludger Eugène » / « Auty » sur cette seule coupe ne tiennent pas devant l’acte (mauvaise segmentation d’<strong>Antzlinger</strong>) <span class="tag tag-f"><span class="tag tag-f">[F]</span></span>.</p>
+<p class="source-line">→ <a href="https://archives-deux-sevres-vienne.fr/ark:/28387/vtae58beb875beb936c">TD 1893-1902</a></p>
+<div class="figure-wrap"><img alt="Table décennale des mariages, ligne du 16 avril 1898" src="assets/TD_1893-1902_mariages_Audy_Ludger_27e12e11.jpg" /><span class="zoom-hint">Agrandir</span></div>
+<p><em>Ligne de table <span class="tag tag-f"><span class="tag tag-f">[F]</span></span> pour la date et Coutard. Ne prouve pas « <button type="button" class="xref" data-xref="audy">Audy</button> ».</em></p>
+<p>Notice généalogique concordante (même acte, pas une seconde preuve) <span class="tag tag-s"><span class="tag tag-s">[S]</span></span> - <a href="https://www.klingenthal.fr/familles/oxygen/evp41.htm">Klingenthal</a>.</p>
+<hr />
+<h2 id="recensements-1901-et-1906">Recensements 1901 et 1906</h2>
+<p>Arks : <strong>1901</strong> = <a href="https://archives-deux-sevres-vienne.fr/ark:/28387/vta665cfe8970b9baaf">vta665cfe8970b9baaf</a> ; <strong>1906</strong> = <a href="https://archives-deux-sevres-vienne.fr/ark:/28387/vtacedbf0fa3ba691b6">vtacedbf0fa3ba691b6</a> <span class="tag tag-f"><span class="tag tag-f">[F]</span></span>.</p>
+<p>Sur les colonnes de noms consultées (1901 : vues 2–23 + récaps ; 1906 : vue 2 entière et vues 3–23) : <strong>aucun <button type="button" class="xref" data-xref="audy">Audy</button></strong>, ni Auty, ni <button type="button" class="xref" data-xref="salis">Salis</button>, ni Antzlinger, ni Coutard <span class="tag tag-f"><span class="tag tag-f">[F]</span></span> (négatif borné à ces vues).</p>
+<p>Audoux et Aubéry (D’Aubery en 1906) sont d’autres familles <span class="tag tag-f"><span class="tag tag-f">[F]</span></span>. Des habitants s’appellent Caroline ou Marie Louise : prénoms, pas titres de maison <span class="tag tag-f"><span class="tag tag-f">[F]</span></span>.</p>
+<p>La rue Pierre-d’Argenson n’apparaît pas comme section du chef-lieu sur les tableaux lus <span class="tag tag-f"><span class="tag tag-f">[F]</span></span>. En 1906, la récapitulation (vue 24) nomme Bourg, Rue du Pont et Quartier Halle, Rue Neuve, Route Nationale, Champ de foire <span class="tag tag-f"><span class="tag tag-f">[F]</span></span>.</p>
+<p>REC 1891 : <button type="button" class="xref" data-xref="audy">Audy</button> non repéré sur les <em>vues consultées</em> <span class="tag tag-f"><span class="tag tag-f">[F]</span></span> - <a href="https://archives-deux-sevres-vienne.fr/ark:/28387/vta16b47523a5bb815d">REC 1891</a>.</p>
+<p>Un <button type="button" class="xref" data-xref="audy">Audy</button> aux Ormes avant ~1950 reste possible via matrices / acte de vente <span class="tag tag-av"><span class="tag tag-av">[ÀV]</span></span>.</p>
+<hr />
+<h2 id="plans-deglane">Plans Deglane</h2>
+<p>La cote AN <strong>AJ/52/361</strong> citée par AGORHA est un <strong>dossier d’élève</strong> (lettres, notes), <strong>pas</strong> un fonds de plans de la villa <span class="tag tag-f"><span class="tag tag-f">[F]</span></span>.</p>
+<p class="source-line">→ <a href="https://agorha.inha.fr/ark:/54721/0cc32af3-1b5d-4c63-8d69-244e6863cdaf">AGORHA — notice Deglane</a></p>
+<p>Chasse catalogue 2026-11-23 (Léonore, INHA, POP, PSS, Sitadel) : pas de plan de <em>cette</em> villa trouvé en ligne. Reste ouvert : permis communaux / AD en salle.</p>
+<hr />
+<h2 id="notaire-lasserré">Notaire Lasserré</h2>
+<p>Georges Victor Lasserré (Châtellerault) : répertoire en ligne pour la vigne de 1890 <span class="tag tag-f"><span class="tag tag-f">[F]</span></span> ; minutes à consulter sur place <span class="tag tag-av"><span class="tag tag-av">[ÀV]</span></span>.</p>
+<p class="source-line">→ <a href="https://archives-deux-sevres-vienne.fr/ark:/28387/vta39b1102e998b87df">Répertoire Lasserré</a></p>
+<div class="figure-wrap"><img alt="Vigne rappelée à l’inventaire" src="assets/FRAN_0159_22721_lieudit_prix_a0582ffe.jpg" /><span class="zoom-hint">Agrandir</span></div>
+<p><em>Lieu-dit « les Ormes », <button type="button" class="xref" data-xref="naintre">Naintré</button>, 1 ha 48 a 4 ca, 3 300 F <span class="tag tag-f"><span class="tag tag-f">[F]</span></span>. Toujours la vigne, jamais la villa.</em></p>
+<hr />
+<h2 id="tang-haywen-géographie">Tang Haywen / géographie</h2>
+<p>Archives Tang croisent <button type="button" class="xref" data-xref="audy">Audy</button> / Caroline / Fabrice et parlent d’une « Villa Caroline » « sur les rives de la Loire » <span class="tag tag-h"><span class="tag tag-h">[H]/[ÀV]</span></span> — tension avec Les Ormes (Vienne).</p>
+<p class="source-line">→ <a href="https://www.tanghaywenarchives.com/fr/friends/raymond-audy">Tang Haywen - Raymond Audy</a></p>
+<hr />
+<h2 id="encore-ouvert-salle">Encore ouvert (salle)</h2>
+<ul>
+<li>Matrices <button type="button" class="xref" data-xref="parcelle">AB 143</button>  </li>
+<li>Minute 1890 (4 E 46 417 / 424 selon commande)  </li>
+<li>Inventaire 1897, feuillets complets  </li>
+<li>Acte d’acquisition <button type="button" class="xref" data-xref="audy">Audy</button>  </li>
+<li>Permis / plans communaux  </li>
+<li>État civil <button type="button" class="xref" data-xref="naintre">Naintré</button> (décès <button type="button" class="xref" data-xref="salis">Salis</button> 20/03/1897 déjà <span class="tag tag-f">[F]</span> notices)</li>
+</ul>
+  </main>
+</div>
+<button type="button" class="back-top" aria-label="Haut de page">Haut ↑</button>
+<div class="lightbox" aria-hidden="true" role="dialog" aria-label="Image agrandie">
+  <button type="button" class="lightbox-close">Fermer</button>
+  <img src="" alt="">
+  <div class="lightbox-cap"></div>
+</div>
+<script>(() => {
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+  /* Progress + back-to-top */
+  const bar = $(".progress > span");
+  const backTop = $(".back-top");
+  const onScroll = () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+    if (bar) bar.style.width = `${pct}%`;
+    if (backTop) backTop.classList.toggle("is-visible", window.scrollY > 700);
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+  backTop?.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+  /* TOC: collapsible on phone, always open on desktop */
+  const tocBox = $(".toc-box");
+  const syncTocOpen = () => {
+    if (!tocBox) return;
+    tocBox.open = !window.matchMedia("(max-width: 900px)").matches;
+  };
+  syncTocOpen();
+  window.addEventListener("resize", syncTocOpen, { passive: true });
+
+  /* TOC scroll-spy */
+  const tocLinks = $$(".toc a[href^='#']");
+  const sections = tocLinks
+    .map((a) => document.getElementById(a.getAttribute("href").slice(1)))
+    .filter(Boolean);
+  if (sections.length && "IntersectionObserver" in window) {
+    const map = new Map();
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => map.set(e.target.id, e.isIntersecting));
+        let current = null;
+        for (const s of sections) {
+          if (map.get(s.id)) current = s.id;
+        }
+        if (!current) return;
+        tocLinks.forEach((a) => {
+          a.classList.toggle("is-active", a.getAttribute("href") === `#${current}`);
+        });
+      },
+      { rootMargin: "-20% 0px -65% 0px", threshold: 0 }
+    );
+    sections.forEach((s) => io.observe(s));
+  }
+  tocLinks.forEach((a) => {
+    a.addEventListener("click", () => {
+      if (tocBox && window.matchMedia("(max-width: 900px)").matches) {
+        tocBox.open = false;
+      }
+    });
+  });
+
+  /* Tag tips */
+  const TIPS = {
+    f: "Fait établi - document, archive ou photo contrôlée",
+    s: "Source secondaire - tradition, presse, blog, OT",
+    h: "Hypothèse plausible - pas encore prouvée",
+    av: "À vérifier - cité ailleurs, pas contrôlé sur pièce",
+  };
+  $$(".tag").forEach((el) => {
+    const cls = [...el.classList].find((c) => c.startsWith("tag-") && c !== "tag");
+    const key = (cls || "").replace("tag-", "");
+    if (TIPS[key]) el.setAttribute("data-tip", TIPS[key]);
+  });
+
+  /* Filter chips - hide titles, images, blocks without matching proof tags */
+  const article = $(".article");
+
+  const clearProofFilter = () => {
+    document.body.classList.remove("is-filtering", "filter-f", "filter-s", "filter-h", "filter-av");
+    $$(".is-proof-dim").forEach((el) => el.classList.remove("is-proof-dim"));
+    $$(".tag.is-proof-match").forEach((el) => el.classList.remove("is-proof-match"));
+    $$("[data-filter]").forEach((b) => b.classList.remove("is-on"));
+  };
+
+  const headingRank = (el) => {
+    if (!el || !/^H[23]$/.test(el.tagName)) return 99;
+    return Number(el.tagName[1]);
+  };
+
+  const applyProofFilter = (key) => {
+    clearProofFilter();
+    if (!key || !article) return;
+
+    document.body.classList.add("is-filtering", `filter-${key}`);
+    $$("[data-filter]").forEach((b) =>
+      b.classList.toggle("is-on", b.dataset.filter === key)
+    );
+
+    const tagSel = `.tag-${key}`;
+    $$(".tag").forEach((t) => {
+      if (t.classList.contains(`tag-${key}`)) t.classList.add("is-proof-match");
+    });
+
+    const nodes = [...article.children].filter(
+      (n) => !n.classList.contains("mobile-explore")
+    );
+    const keep = nodes.map(() => false);
+    const hasTag = (el) => !!(el && el.querySelector?.(tagSel));
+
+    for (let i = 0; i < nodes.length; i++) {
+      const el = nodes[i];
+      if (el.classList.contains("tag-legend")) {
+        keep[i] = true;
+        continue;
+      }
+      if (hasTag(el)) keep[i] = true;
+    }
+
+    // Media kept when its caption (next tagged block) matches
+    for (let i = 0; i < nodes.length; i++) {
+      const el = nodes[i];
+      const isMedia =
+        el.classList.contains("figure-wrap") ||
+        el.classList.contains("compare") ||
+        el.classList.contains("compare-caption");
+      if (!isMedia) continue;
+      for (let j = i + 1; j < Math.min(i + 3, nodes.length); j++) {
+        if (headingRank(nodes[j]) <= 3) break;
+        if (hasTag(nodes[j])) {
+          keep[i] = true;
+          keep[j] = true;
+          break;
+        }
+      }
+    }
+
+    // Caption with tag → keep preceding media
+    for (let i = 1; i < nodes.length; i++) {
+      if (!hasTag(nodes[i])) continue;
+      const prev = nodes[i - 1];
+      if (
+        prev.classList.contains("figure-wrap") ||
+        prev.classList.contains("compare") ||
+        prev.classList.contains("compare-caption")
+      ) {
+        keep[i - 1] = true;
+      }
+    }
+
+    // Source lines travel with the previous kept statement
+    for (let i = 1; i < nodes.length; i++) {
+      if (nodes[i].classList.contains("source-line") && keep[i - 1]) {
+        keep[i] = true;
+      }
+    }
+
+    // Headings: keep only if something below (until next equal/higher heading) is kept
+    for (let i = 0; i < nodes.length; i++) {
+      const r = headingRank(nodes[i]);
+      if (r > 3) continue;
+      let any = false;
+      for (let j = i + 1; j < nodes.length; j++) {
+        if (headingRank(nodes[j]) <= r) break;
+        if (keep[j]) {
+          any = true;
+          break;
+        }
+      }
+      keep[i] = any;
+    }
+
+    // Lone <hr> between hidden blocks → hide
+    for (let i = 0; i < nodes.length; i++) {
+      if (nodes[i].tagName !== "HR") continue;
+      const prevKept = i > 0 && keep[i - 1];
+      const nextKept = i < nodes.length - 1 && keep[i + 1];
+      keep[i] = prevKept && nextKept;
+    }
+
+    nodes.forEach((el, i) => {
+      if (!keep[i]) el.classList.add("is-proof-dim");
+    });
+
+    tocLinks.forEach((a) => {
+      const id = (a.getAttribute("href") || "").slice(1);
+      const target = id ? document.getElementById(id) : null;
+      a.classList.toggle(
+        "is-proof-dim",
+        !!(target && target.classList.contains("is-proof-dim"))
+      );
+    });
+  };
+
+  const setFilter = (key) => applyProofFilter(key);
+  $$("[data-filter]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.filter;
+      const on = btn.classList.contains("is-on");
+      setFilter(on ? null : key);
+    });
+  });
+
+  /* Cross-references */
+  const XREF_TARGETS = {
+    deglane: "#henri-deglane-1855-1931-larchitecte",
+    salis: "#rodolphe-salis-1851-1897-et-le-chat-noir",
+    "marie-louise": "#marie-louise-un-prénom-de-maison-pas-un-état-civil",
+    audy: "#la-famille-audy-et-le-nom-caroline",
+    naintre: "#lachat-du-7-novembre-1890-vigne-à-naintré",
+    parcelle: "#la-parcelle",
+  };
+
+  const flash = (el) => {
+    if (!el) return;
+    el.classList.remove("is-flash");
+    void el.offsetWidth;
+    el.classList.add("is-flash");
+  };
+
+  const goXref = (key) => {
+    const sel = XREF_TARGETS[key];
+    const el = sel ? $(sel) : null;
+    $$("[data-xref-chip]").forEach((b) => b.classList.toggle("is-on", b.dataset.xrefChip === key));
+    ["salis", "deglane", "marie-louise", "audy", "naintre", "parcelle"].forEach((k) => {
+      document.body.classList.toggle(`xref-${k}`, k === key);
+    });
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      flash(el);
+      $$(".xref-hit").forEach((n) => n.classList.remove("xref-hit"));
+      $$(`.xref[data-xref="${key}"]`).forEach((n) => {
+        n.classList.add("xref-hit");
+        flash(n);
+      });
+    }
+  };
+
+  $$("[data-xref-chip]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.xrefChip;
+      if (btn.classList.contains("is-on")) {
+        btn.classList.remove("is-on");
+        document.body.classList.remove(`xref-${key}`);
+        return;
+      }
+      goXref(key);
+    });
+  });
+
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".xref");
+    if (!btn) return;
+    e.preventDefault();
+    goXref(btn.dataset.xref);
+  });
+
+  /* Lightbox */
+  const lb = $(".lightbox");
+  const lbImg = $(".lightbox img");
+  const lbCap = $(".lightbox-cap");
+  const openLb = (src, cap) => {
+    if (!lb || !lbImg) return;
+    lbImg.src = src;
+    if (lbCap) lbCap.textContent = cap || "";
+    lb.classList.add("is-open");
+    lb.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  };
+  const closeLb = () => {
+    lb?.classList.remove("is-open");
+    lb?.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  };
+  /* Lightbox — delegated so restored article HTML still works */
+  const articleRoot = $(".article");
+  articleRoot?.addEventListener("click", (e) => {
+    const img = e.target.closest(".figure-wrap img, .article > p > img");
+    if (!img || img.closest(".compare")) return;
+    const cap =
+      img.closest(".figure-wrap")?.nextElementSibling?.textContent?.trim() ||
+      img.alt ||
+      "";
+    openLb(img.src, cap);
+  });
+  lb?.addEventListener("click", (e) => {
+    if (e.target === lb || e.target.classList.contains("lightbox-close")) closeLb();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeLb();
+  });
+
+  /* Compare sliders (touch + mouse) — rebindable after article restore.
+     WeakSet (not data-*) so IDB/localStorage restores never skip rebinding. */
+  const compareBound = new WeakSet();
+  const bindCompare = (root = document) => {
+    $$(".compare", root).forEach((box) => {
+      box.removeAttribute("data-compare-bound");
+      if (compareBound.has(box)) return;
+      const top = $(".compare-top", box);
+      const handle = $(".compare-handle", box);
+      if (!top || !handle) return;
+      compareBound.add(box);
+      let dragging = false;
+      let activePointer = null;
+      const setPos = (clientX) => {
+        const rect = box.getBoundingClientRect();
+        if (!rect.width) return;
+        let x = ((clientX - rect.left) / rect.width) * 100;
+        x = Math.max(2, Math.min(98, x));
+        const clip = `inset(0 ${100 - x}% 0 0)`;
+        top.style.clipPath = clip;
+        top.style.webkitClipPath = clip;
+        handle.style.left = `${x}%`;
+      };
+      const move = (e) => {
+        if (!dragging) return;
+        if (activePointer != null && e.pointerId != null && e.pointerId !== activePointer) return;
+        setPos(e.clientX);
+      };
+      const end = (e) => {
+        if (activePointer != null && e?.pointerId != null && e.pointerId !== activePointer) return;
+        dragging = false;
+        activePointer = null;
+        window.removeEventListener("pointermove", move);
+        window.removeEventListener("pointerup", end);
+        window.removeEventListener("pointercancel", end);
+        try {
+          if (e?.pointerId != null) box.releasePointerCapture?.(e.pointerId);
+        } catch (_) {
+          /* ignore */
+        }
+      };
+      const start = (e) => {
+        if (e.button != null && e.button !== 0) return;
+        dragging = true;
+        activePointer = e.pointerId ?? null;
+        try {
+          if (activePointer != null) box.setPointerCapture(activePointer);
+        } catch (_) {
+          /* ignore */
+        }
+        window.addEventListener("pointermove", move, { passive: true });
+        window.addEventListener("pointerup", end);
+        window.addEventListener("pointercancel", end);
+        setPos(e.clientX);
+        e.preventDefault();
+      };
+      box.addEventListener("pointerdown", start, { passive: false });
+      // Click anywhere on the strip also jumps the divider (discoverability)
+      box.addEventListener(
+        "keydown",
+        (e) => {
+          if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+          const cur = parseFloat(handle.style.left) || 50;
+          setPos(
+            box.getBoundingClientRect().left +
+              ((e.key === "ArrowLeft" ? cur - 5 : cur + 5) / 100) *
+                box.getBoundingClientRect().width,
+          );
+          e.preventDefault();
+        },
+        { passive: false },
+      );
+      if (!box.hasAttribute("tabindex")) box.tabIndex = 0;
+    });
+  };
+  bindCompare();
+  document.addEventListener("villa:article-restored", () => bindCompare(articleRoot || document));
+})();
+
+</script>
+</body>
+</html>
