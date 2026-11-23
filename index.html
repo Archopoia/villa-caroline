@@ -1020,7 +1020,7 @@ body.is-editing .article {
 <h3 id="ce-que-montrent-les-photos-aériennes">Ce que montrent les photos aériennes</h3>
 <p>Dès les années 1950-1965, le volume principal est déjà là <span class="tag tag-f">[F]</span>. Il n’y a pas encore de piscine <span class="tag tag-f">[F]</span>. Entre 2000 et 2005, une piscine rectangulaire apparaît dans le jardin ; elle reste ensuite <span class="tag tag-f">[F]</span>.</p>
 <p class="source-line">→ <a href="https://remonterletemps.ign.fr/comparer/?lon=0.603394&amp;lat=46.975082&amp;z=19">IGN - Remonter le temps (comparer)</a></p>
-<div class="compare" role="img" aria-label="Comparaison aérienne 1950 et 2000"><img src="assets/2000-2005_8b35297e.jpg" alt="Vue aérienne 2000-2005"><img class="compare-top" src="assets/1950-1960_58d6da82.jpg" alt="Vue aérienne 1950-1960"><div class="compare-handle" aria-hidden="true"></div><span class="compare-label before">1950-60</span><span class="compare-label after">2000-05</span></div><p class="compare-caption">Glisser pour comparer : orthophoto 1950-1960 (sans piscine) et 2000-2005 (avec piscine).</p>
+<div class="compare" role="group" tabindex="0" aria-label="Comparaison aérienne 1950 et 2000 — glisser ou flèches gauche/droite"><img src="assets/2000-2005_8b35297e.jpg" alt="Vue aérienne 2000-2005" draggable="false"><img class="compare-top" src="assets/1950-1960_58d6da82.jpg" alt="Vue aérienne 1950-1960" draggable="false"><div class="compare-handle" aria-hidden="true"></div><span class="compare-label before">1950-60</span><span class="compare-label after">2000-05</span></div><p class="compare-caption">Glisser pour comparer : orthophoto 1950-1960 (sans piscine) et 2000-2005 (avec piscine).</p>
 <p>Volume principal conservé dans ses grandes lignes depuis le milieu du XXᵉ <span class="tag tag-f">[F]</span> ; piscine = ajout, visible au début du XXIᵉ <span class="tag tag-f">[F]</span>. Attribution du creusement à la famille <button type="button" class="xref" data-xref="audy">Audy</button> : tradition locale <span class="tag tag-s">[S]</span> - <a href="https://www.tourisme-chatellerault.fr/2020/09/08/les-ormes-la-surprise-du-chef-1-2/">OT 2020</a>.</p>
 <hr>
 <h2 id="3-les-personnes-du-récit">3. Les personnes du récit</h2>
@@ -2108,7 +2108,8 @@ body.is-editing .article {
   const navInner = document.querySelector(".site-nav-inner");
   if (!article || !navInner) return;
 
-  const LS_HEAD = "villa-caroline-head-html-v3";
+  // bump when shipped article chrome/widgets change (avoids stale IDB wiping fixes)
+  const LS_HEAD = "villa-caroline-head-html-v4";
   let editing = false;
   let snapshotBefore = "";
   let htmlBefore = "";
