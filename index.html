@@ -805,10 +805,6 @@ body.xref-parcelle .xref[data-xref="parcelle"] {
   border: 1px solid var(--line, #d8ddd4); background: #fff; color: var(--ink, #1c241e);
 }
 .edit-btn.edit-save { background: #2f4a3c; color: #fff; border-color: #2f4a3c; }
-.edit-label {
-  font: inherit; font-size: .82rem; padding: .35rem .55rem;
-  border: 1px solid var(--line, #d8ddd4); border-radius: 6px; min-width: 12rem;
-}
 .edit-status { font-size: .78rem; color: var(--muted, #5c6b60); max-width: 28rem; }
 .edit-status.is-ok { color: #1e6b3a; }
 .edit-status.is-err { color: #9b1c1c; }
@@ -835,7 +831,6 @@ body.is-editing .article {
       <a href="index.html" class="is-active">Monographie</a>
       <a href="archives.html">Archives</a>
       <a href="recherche.html">Recherche</a>
-      <a href="histoire.html">Histoire</a>
     </nav>
   </div>
 </header>
@@ -1937,7 +1932,7 @@ body.is-editing .article {
   };
 })();
 </script>
-<script>/* Review/edit monography → Save updates main page + incremental history track */
+<script>/* Review/edit monography → Corriger / Enregistrer updates live article (+ disk via API) */
 (() => {
   if (!document.body.classList.contains("mono-page")) return;
   const H = window.VillaHistory;
@@ -2041,13 +2036,11 @@ body.is-editing .article {
     <button type="button" class="edit-btn" data-edit-action="toggle">Corriger</button>
     <button type="button" class="edit-btn edit-save" data-edit-action="save" hidden>Enregistrer</button>
     <button type="button" class="edit-btn edit-cancel" data-edit-action="cancel" hidden>Annuler</button>
-    <input type="text" class="edit-label" placeholder="Libellé" hidden maxlength="120">
     <span class="edit-status" aria-live="polite"></span>
   `;
   navInner.appendChild(bar);
 
   const status = bar.querySelector(".edit-status");
-  const labelInput = bar.querySelector(".edit-label");
   const btnToggle = bar.querySelector('[data-edit-action="toggle"]');
   const btnSave = bar.querySelector('[data-edit-action="save"]');
   const btnCancel = bar.querySelector('[data-edit-action="cancel"]');
@@ -2066,7 +2059,6 @@ body.is-editing .article {
     btnToggle.hidden = on;
     btnSave.hidden = !on;
     btnCancel.hidden = !on;
-    labelInput.hidden = !on;
     if (on) article.focus({ preventScroll: true });
     else setStatus("");
   };
@@ -2087,24 +2079,15 @@ body.is-editing .article {
   btnSave.addEventListener("click", async () => {
     const plain = H.articlePlain(article);
     const htmlSnap = article.innerHTML;
-    const label = labelInput.value.trim() || `Correction ${new Date().toLocaleString("fr-FR")}`;
     btnSave.disabled = true;
     try {
-      const res = await H.createTrack({
-        label,
-        oldText: snapshotBefore,
-        newText: plain,
-        beforeHtml: htmlBefore,
-        snapshotHtml: htmlSnap,
-        source: "review-ui",
-      });
-      if (!res.ok) {
+      const { empty } = H.diffIncremental(snapshotBefore, plain);
+      if (empty) {
         setStatus("Aucun changement.", false);
         btnSave.disabled = false;
         return;
       }
       await persistHead(htmlSnap, plain);
-      // Auto-écrase current-article + indexes si API locale
       let diskOk = false;
       try {
         const disk = await pushToDisk(htmlSnap);
@@ -2114,17 +2097,11 @@ body.is-editing .article {
       }
       snapshotBefore = plain;
       htmlBefore = htmlSnap;
-      labelInput.value = "";
       setEditing(false);
       setStatus(
         diskOk ? "Enregistré (monographie + disque)." : "Enregistré sur la monographie.",
         true,
       );
-      try {
-        localStorage.setItem("villa-history-ping", String(Date.now()));
-      } catch (_) {
-        /* ignore */
-      }
     } catch (e) {
       setStatus(String(e.message || e), false);
     } finally {
